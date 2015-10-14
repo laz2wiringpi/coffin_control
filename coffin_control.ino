@@ -20,7 +20,7 @@
 #define C_VERSION "V1.05"
 
 long inputvalue = NOVALUEINPUT;
-#define testloop 1
+ 
 
  
 
@@ -61,10 +61,16 @@ SoftwareSerial serial_otherboard(rxPin, txPin); // RX, TX
 #endif
 
 /////////// program loop vars 
+
+int testloop =  1;
+
+
 enum pr_stats {
   pr_none,
   pr_open,
-  pr_situp
+  pr_situp,
+  pr_close,
+  pr_sitdown
 };
 
 pr_stats programloopstat = pr_none ;
@@ -135,7 +141,7 @@ void   programloop(){
   switch (programloopstat){
   case pr_open:
           
-       
+    
        if (   DoorMotor.Current_pot() > ( (DoorMotor.POT_MAX - DoorMotor.POT_DTG) - 5 )  ) {
           programloopstat = pr_situp;  
          } else {
@@ -146,7 +152,10 @@ void   programloop(){
          }
       break;
   case pr_situp:
-   
+         if (   DoorMotor.Current_pot() < ( (DoorMotor.POT_MAX - DoorMotor.POT_DTG) - 5 )  ) {
+           programloopstat = pr_open;   
+           return; 
+         }
    if (   SitMotor.Current_pot() > ( (SitMotor.POT_MAX - DoorMotor.POT_DTG) - 5 )  ) {
           programloopstat = pr_none;  
          } else {
@@ -156,7 +165,35 @@ void   programloop(){
           }
          }
       break;
-     
+
+    case pr_close:
+          
+          if (   SitMotor.Current_pot() > ( (SitMotor.POT_MIN + DoorMotor.POT_DTG) + 5 )  ) {
+            programloopstat = pr_sitdown;   
+           return; 
+          }
+          
+       if (   DoorMotor.Current_pot() < ( (DoorMotor.POT_MIN + DoorMotor.POT_DTG) + 5 )  ) {
+          programloopstat = pr_none;  
+         } else {
+          if ((DoorMotor.GetDIRECTION() ==  DIRECTION_OFF) &&  (   DoorMotor.Current_pot() > ( DoorMotor.POT_MIN + DoorMotor.POT_DTG)    )) {
+               docmd('c');    
+        
+         }
+         }
+      break;
+  case pr_sitdown:
+   
+   if (   SitMotor.Current_pot() < ( (SitMotor.POT_MIN + DoorMotor.POT_DTG) + 5 )  ) {
+          programloopstat = pr_close;   
+         } else {
+         if ( (SitMotor.GetDIRECTION() ==  DIRECTION_OFF) &&  (   SitMotor.Current_pot() > ( SitMotor.POT_MAX + SitMotor.POT_DTG  )  ) ) {
+               docmd('D');    
+        
+          }
+         }
+      break;
+         
   
   
   }
@@ -371,12 +408,17 @@ if (irrecv.decode(&results)) { //we have received an IR
         break;
   
       case 0X32C6FDF7:
+        testloop = false;
+        programloopstat = pr_situp;  
+       
         Serial.println ("*");  
                 Serial.println (IRvalue); 
             IRvalue = NOVALUEINPUT; 
         break;
       
       case 0X3EC3FC1B:
+          testloop = false;
+        programloopstat = pr_sitdown; 
         Serial.println ("#"); 
                Serial.println (IRvalue); 
             IRvalue = NOVALUEINPUT;   
@@ -412,6 +454,7 @@ if (irrecv.decode(&results)) { //we have received an IR
         break;
               
      case 0XD7E84B1B:
+     testloop = true;
         Serial.println ("OK"); 
      
          Serial.println (IRvalue); 
