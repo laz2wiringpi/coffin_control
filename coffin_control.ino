@@ -105,15 +105,15 @@ void setup()
   SitMotor.MAX_BREAK = 10;
 
   DoorMotor.stop_after_run = true;
-  DoorMotor.POT_MIN = 325;
-  DoorMotor.POT_MAX = 900;
+  DoorMotor.POT_MIN = 335;
+  DoorMotor.POT_MAX = 890;
   DoorMotor.MOTOR_START = 100;
   DoorMotor.POT_DTG = 10;
 //  DoorMotor.MOTOR_MIN = 1;
-  DoorMotor.MOTOR_MAX = 250;
+  DoorMotor.MOTOR_MAX = 200;
   DoorMotor.target_vol = 180;
-  DoorMotor.VOL_FACTOR = 3;
-  DoorMotor.MAX_BREAK = 10;
+  DoorMotor.VOL_FACTOR = 5;
+  DoorMotor.MAX_BREAK = 5;
 
 #ifdef HAS_IR
   irrecv.enableIRIn(); //start the receiver
@@ -524,7 +524,14 @@ void docmd( char inChar ){
  
       inputvalue = NOVALUEINPUT;
     break;
-
+   case 'e':
+      errordetect = false;
+      SitMotor.Stop();
+      DoorMotor.Stop();
+     
+ 
+      inputvalue = NOVALUEINPUT;
+    break;
 
    case 'R': 
       switch (inputvalue)
@@ -544,7 +551,9 @@ void docmd( char inChar ){
 
      case 'U':
      /// check if we will bang head 
-   if (   DoorMotor.Current_pot() < ( (DoorMotor.POT_MAX - DoorMotor.POT_DTG) - 5 )  ) {
+    //Serial.println(DoorMotor.Current_pot() );  
+     //  Serial.println( ( (DoorMotor.POT_MAX - DoorMotor.POT_DTG) - 5 ));
+   if (   DoorMotor.Current_pot() > ( (DoorMotor.POT_MAX - DoorMotor.POT_DTG) - 5 )  ) {
 
        
    

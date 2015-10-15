@@ -132,6 +132,12 @@ int  MotorServo::check(){
 	int newspeed = _last_speed;
 
 	int pot_current = analogRead(_PIN_POT);
+
+
+	///////////////
+	 
+
+
 	/////////////////
 	// use avrage of readings for vol 
 
@@ -153,8 +159,7 @@ int  MotorServo::check(){
 	// calculate the average:
 	int  pot_avrage = totalPot / numPotReadings;
 
-	///////////////
-	 
+
 	if (abs(_target_pos - pot_current) <= POT_DTG) {
 
 
@@ -167,8 +172,6 @@ int  MotorServo::check(){
 
 		return 0;
 	}
-
-
 
 	// calculate the speed do we go up or down 
 	unsigned long current_ms = millis();
@@ -224,17 +227,17 @@ int  MotorServo::check(){
 		if (cur_vol == 0) {
   // use an avrage 
                     _cur_volavgcnt++;
-                    if (_cur_lastvolavgcnt == 0 )
+                 //   if (_cur_lastvolavgcnt == 0 )
 		 	newspeed = _last_speed + 1; // guess;
-                    else{
+                 //   else{
                       // avg 
-                      int inttrunc = _cur_lastvolavgcnt * _cur_volavgcnt;
+                 //     int inttrunc = _cur_lastvolavgcnt * _cur_volavgcnt;
                       
-                       newspeed = newspeed + inttrunc;
+                 //      newspeed = newspeed + inttrunc;
                        
                       
                       
-                      }
+                //      }
                     }
 		
                     
@@ -253,7 +256,7 @@ int  MotorServo::check(){
 				newspeed = _last_speed +      VOL_FACTOR;
 			}
 
-                         _cur_lastvolavgcnt = (newspeed / _cur_volavgcnt);
+                         _cur_lastvolavgcnt = ((_last_speed - newspeed  ) / _cur_volavgcnt);
                         
                         _cur_volavgcnt = 0;
 		}
@@ -406,8 +409,8 @@ int  MotorServo::check(){
 
  if (( _DIRECTION == DIRECTION_DOWN_BRAKE ) || ( _DIRECTION == DIRECTION_UP_BRAKE ))
  {
-  if (newspeed > MAX_BREAK ) 
-           newspeed = MAX_BREAK;
+  if (abs(newspeed) > MAX_BREAK)  
+           newspeed = MAX_BREAK * -1 ;
    
  }
 
