@@ -6,7 +6,7 @@ Version .01
 #ifndef MotorServo_h
 #define MotorServo_h
 
- #define DEBUG
+  #define DEBUG
 
 
 #include "Arduino.h"
@@ -62,7 +62,7 @@ public:
 
 
         long target_vol ;
-		int VOL_FACTOR ;
+		float VOL_FACTOR ;
 	  boolean stop_after_run;
 
    // avg pot readings 

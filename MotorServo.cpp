@@ -30,7 +30,7 @@ MotorServo::MotorServo(int aPIN_POT,
 	//	MOTOR_MIN = 1;
 	MOTOR_MAX = 250;
 	target_vol = 50;
-	VOL_FACTOR = 1;
+	VOL_FACTOR = 0.01;
 	MAX_BREAK = 5;
 	_cur_volavgcnt = 0;
 	_cur_lastvolavgcnt = 0;
@@ -128,25 +128,25 @@ int MotorServo::Run(int apot_avrage){
 int  MotorServo::check(){
 
 
-   if ((_DIRECTION == DIRECTION_OFF )&&(_last_direction != DIRECTION_OFF )){
-   // SHUT IT OFF
-    analogWrite(_PIN_MOTOR, 0);
-   Stop();
-   return 1;
-  }
+	if ((_DIRECTION == DIRECTION_OFF) && (_last_direction != DIRECTION_OFF)){
+		// SHUT IT OFF
+		analogWrite(_PIN_MOTOR, 0);
+		Stop();
+		return 1;
+	}
 	if (_DIRECTION == DIRECTION_OFF){
 		return 0;
 	}
 	int newspeed = _last_speed;
 
 	int pot_current = analogRead(_PIN_POT);
-  if ((_last_direction != DIRECTION_OFF )&&(
-        (pot_current < POT_MIN)||(pot_current > POT_MIN)  )){
-    // SHUT IT OFF
-    analogWrite(_PIN_MOTOR, 0);
-   Stop();
-    return 1;  
-  }
+	if ((_last_direction != DIRECTION_OFF) && (
+		(pot_current < POT_MIN) || (pot_current > POT_MIN))){
+		// SHUT IT OFF
+		analogWrite(_PIN_MOTOR, 0);
+		Stop();
+		return 1;
+	}
 
 	///////////////
 
@@ -191,8 +191,8 @@ int  MotorServo::check(){
 	unsigned long current_ms = millis();
 	/// if last ms less then 4 ms .. return 
 
- // exit if less than  4 ms and we dont  have movement .. 
-	if (((current_ms - _last_ms) < 4)&&(pot_avrage == _last_potavg )) {
+	// exit if less than  4 ms and we dont  have movement .. 
+	if (((current_ms - _last_ms) < 4) && (pot_avrage == _last_potavg)) {
 		return 0;
 	}
 
@@ -217,56 +217,76 @@ int  MotorServo::check(){
 
 
 
-long  cur_vol = 0;
+	long  cur_vol = 0;
 
 	if (_last_direction == DIRECTION_OFF){
 		//// START UP SPEED OF MOTOR 
 		newspeed = MOTOR_START;
 	}
 	else{
-  
-    if (_last_potavg != pot_avrage ) {
-   
-       		// caculate the time {disttrav} {timeval} {cur_vol}
-    	 
-    		long disttrav = _last_potavg - pot_avrage;
-    		disttrav = abs(disttrav);
-    		long timeval = current_ms - _last_ms;
-    		cur_vol = (disttrav * 1000) / timeval;
-    
-    		//cur_vol = ((abs(_last_potavg - pot_avrage) * 1000) / (current_ms - _last_ms));
 
-    }
+		if (_last_potavg != pot_avrage) {
+
+			// caculate the time {disttrav} {timeval} {cur_vol}
+
+			long disttrav = _last_potavg - pot_avrage;
+			disttrav = abs(disttrav);
+			long timeval = current_ms - _last_ms;
+			cur_vol = (disttrav * 1000) / timeval;
+
+			//cur_vol = ((abs(_last_potavg - pot_avrage) * 1000) / (current_ms - _last_ms));
+
+		}
 
 		///////////////////////////////////////////
 
 		if (cur_vol == 0) {
 			// use an avrage 
 			_cur_volavgcnt++;
-			if (_cur_lastvolavgcnt == 0 ){
-			  newspeed = _last_speed + 1; // guess;
-			}else{
-			// avg 
-			   int inttrunc = _cur_lastvolavgcnt * _cur_volavgcnt;
-  	      newspeed = newspeed + inttrunc;
-			 }
-		}else {
-
-			if (cur_vol > target_vol) {
-				// slow it down 
-				//	newspeed = _last_speed - ((cur_vol - target_vol)  *  VOL_FACTOR);
-				newspeed = _last_speed - VOL_FACTOR;
-        _cur_lastvolavgcnt = ( VOL_FACTOR / _cur_volavgcnt )  * -1;
-        
+			if (_cur_lastvolavgcnt == 0){
+				newspeed = _last_speed + 1; // guess;
 			}
-			if (cur_vol < target_vol) {
-
-				//	newspeed = _last_speed + ((target_vol - cur_vol)  *  VOL_FACTOR);
-				newspeed = _last_speed + VOL_FACTOR;
-       _cur_lastvolavgcnt =  VOL_FACTOR /   _cur_volavgcnt ; 
+			else{
+				// avg 
+				int inttrunc = _cur_lastvolavgcnt * _cur_volavgcnt;
+				newspeed = _last_speed + inttrunc;
 			}
+		}
+		else {
 
-  
+
+
+			float volcalc = ((abs(_last_speed) * VOL_FACTOR) * (target_vol - cur_vol)) * VOL_FACTOR;
+			_cur_lastvolavgcnt = (volcalc / _cur_volavgcnt);
+			newspeed = _last_speed + volcalc;
+
+#ifdef DEBUG  
+
+			Serial.print(" volcalc  ");
+			Serial.print(volcalc, 4);
+			Serial.print(" _cur_volavgcnt ");
+			Serial.println(_cur_volavgcnt, DEC);
+			Serial.print(" _cur_lastvolavgcnt ");
+			Serial.println(_cur_lastvolavgcnt, 4);
+#endif
+			/*
+						if (cur_vol > target_vol) {
+						// slow it down
+						//	newspeed = _last_speed - ((cur_vol - target_vol)  *  VOL_FACTOR);
+
+
+						newspeed = _last_speed - VOL_FACTOR;
+						_cur_lastvolavgcnt = (VOL_FACTOR / _cur_volavgcnt)  * -1;
+
+						}
+						if (cur_vol < target_vol) {
+
+						//	newspeed = _last_speed + ((target_vol - cur_vol)  *  VOL_FACTOR);
+						newspeed = _last_speed + VOL_FACTOR;
+						_cur_lastvolavgcnt = VOL_FACTOR / _cur_volavgcnt;
+						}
+						*/
+
 			_cur_volavgcnt = 0;
 		}
 		//////////////////////////////////////// 
@@ -457,8 +477,21 @@ int MotorServo::GetDIRECTION(){
 int  MotorServo::Settarget_pos(int atarget_pos){
 
 
+	if (_target_pos > POT_MAX){
+		_target_pos = POT_MAX;
+	}
+	else if (_target_pos < POT_MIN )
+	{
+		_target_pos = POT_MIN;
+	}
+	else
+	{
+			_target_pos = atarget_pos;
+ 
+	}
+	
 
-	_target_pos = atarget_pos;
+
 
 
 
