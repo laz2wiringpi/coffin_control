@@ -380,7 +380,7 @@ if (irrecv.decode(&results)) { //we have received an IR
          IRDIGIT =4;  
         break;
   
-      case 0XC:
+      case 0X3D9AE3F7:
         IRDIGIT =5;   
         break;
    
