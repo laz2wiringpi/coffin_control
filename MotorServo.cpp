@@ -31,8 +31,9 @@ MotorServo::MotorServo(int aPIN_POT,
 	MOTOR_MAX = 250;
 	target_vol = 50;
 	VOL_FACTOR = 1;
-  MAX_BREAK = 5;
-
+        MAX_BREAK = 5;
+        _cur_volavgcnt = 0;
+        _cur_lastvolavgcnt = 0; 
 	// _PIN_POT = DEFAULT_PIN_POT;
 	// _PIN_MOTOR = DEFAULT_PIN_MOTOR;
 	// _PIN_MOTOR_UP = DEFAULT_PIN_MOTOR_UP;
@@ -221,10 +222,26 @@ int  MotorServo::check(){
 		///////////////////////////////////////////
 
 		if (cur_vol == 0) {
-		 	newspeed = _last_speed + 1;
-		}
+  // use an avrage 
+                    _cur_volavgcnt++;
+                    if (_cur_lastvolavgcnt == 0 )
+		 	newspeed = _last_speed + 1; // guess;
+                    else{
+                      // avg 
+                      int inttrunc = _cur_lastvolavgcnt * _cur_volavgcnt;
+                      
+                       newspeed = newspeed + inttrunc;
+                       
+                      
+                      
+                      }
+                    }
+		
+                    
 		else
 		{
+                      
+                        
 			if (cur_vol > target_vol) {
 				// slow it down 
 			//	newspeed = _last_speed - ((cur_vol - target_vol)  *  VOL_FACTOR);
@@ -235,6 +252,10 @@ int  MotorServo::check(){
 			//	newspeed = _last_speed + ((target_vol - cur_vol)  *  VOL_FACTOR);
 				newspeed = _last_speed +      VOL_FACTOR;
 			}
+
+                         _cur_lastvolavgcnt = (newspeed / _cur_volavgcnt);
+                        
+                        _cur_volavgcnt = 0;
 		}
 		//////////////////////////////////////// 
 
@@ -356,7 +377,7 @@ int  MotorServo::check(){
 	// test for rev .brakeing 
 	 
 	 // get motor moving 
-
+/*
 	///
 	if (_last_direction == DIRECTION_OFF){
 		 
@@ -380,7 +401,7 @@ int  MotorServo::check(){
 	  pot_avrage = analogRead(_PIN_POT);
 
 	}
-
+*/
 // max break ... speed 
 
  if (( _DIRECTION == DIRECTION_DOWN_BRAKE ) || ( _DIRECTION == DIRECTION_UP_BRAKE ))

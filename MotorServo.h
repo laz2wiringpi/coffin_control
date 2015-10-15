@@ -78,6 +78,8 @@ private:
 	int _PIN_MOTOR ;
 	int _PIN_MOTOR_UP ;
 	int _PIN_MOTOR_DOWN  ;
+        int _cur_volavgcnt;
+        float _cur_lastvolavgcnt;
 
  
 	

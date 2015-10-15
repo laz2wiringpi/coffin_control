@@ -380,7 +380,7 @@ if (irrecv.decode(&results)) { //we have received an IR
          IRDIGIT =4;  
         break;
   
-      case 0XC3D9AE3F7:
+      case 0XC:
         IRDIGIT =5;   
         break;
    
@@ -544,7 +544,7 @@ void docmd( char inChar ){
 
      case 'U':
      /// check if we will bang head 
-   if (   DoorMotor.Current_pot() > ( (DoorMotor.POT_MAX - DoorMotor.POT_DTG) - 5 )  ) {
+   if (   DoorMotor.Current_pot() < ( (DoorMotor.POT_MAX - DoorMotor.POT_DTG) - 5 )  ) {
 
        
    
@@ -612,7 +612,7 @@ void docmd( char inChar ){
 
     //  Serial.println("<num>C - Close POT_Min ");
      case  'c':
- if (   SitMotor.Current_pot() > ( (SitMotor.POT_MIN + SitMotor.POT_DTG) + 5 )  ) {
+ if (   SitMotor.Current_pot() < ( (SitMotor.POT_MIN + SitMotor.POT_DTG) + 5 )  ) {
 
        
 
