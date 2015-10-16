@@ -8,10 +8,10 @@ Released into the public domain.
 #include "MotorServo.h"
 
 ////////////////////////////////////////
-MotorServo::MotorServo(int aPIN_POT,
-	int aPIN_MOTOR,
-	int aPIN_MOTOR_UP,
-	int aPIN_MOTOR_DOWN)
+MotorServo::MotorServo(byte aPIN_POT,
+	byte aPIN_MOTOR,
+	byte aPIN_MOTOR_UP,
+	byte aPIN_MOTOR_DOWN)
 {
 
 	 
@@ -45,7 +45,7 @@ MotorServo::MotorServo(int aPIN_POT,
 }
 
  
-int MotorServo::GetDIRECTION(){
+DIRECTIONS MotorServo::GetDIRECTION(){
 	return _lastdirection;
 
 }
@@ -66,7 +66,7 @@ int MotorServo::StopMotor(){
 
 }
 
-void  MotorServo::donot_burn_out_hbridge(int mpin, int mspeed){
+void  MotorServo::donot_burn_out_hbridge(byte mpin, byte mspeed){
 	analogWrite(_PIN_MOTOR, 0);
 	if (mpin == _PIN_MOTOR_UP) {
 		digitalWrite(_PIN_MOTOR_DOWN, LOW);

@@ -6,7 +6,7 @@ Version .01
 #ifndef MotorServo_h
 #define MotorServo_h
 
-  #define DEBUG
+//#define DEBUG
 
 
 #include "Arduino.h"
@@ -27,10 +27,10 @@ class MotorServo
 {
 public:
 
-	    MotorServo(int aPIN_POT ,
-		int aPIN_MOTOR ,
-		int aPIN_MOTOR_UP ,
-		int aPIN_MOTOR_DOWN );
+	    MotorServo(byte aPIN_POT ,
+		byte aPIN_MOTOR ,
+		byte aPIN_MOTOR_UP ,
+		byte aPIN_MOTOR_DOWN );
 
 		int StopMotor();
 		int Goto(int target);
@@ -39,12 +39,12 @@ public:
     //    int MAX_BREAK;
 		int POT_MIN;
 		int POT_MAX;
-		int UP_SPEED;
-		int DOWN_SPEED;
+		byte UP_SPEED;
+		byte DOWN_SPEED;
 	 
 
 		int Current_pot();
-		int GetDIRECTION();
+		DIRECTIONS GetDIRECTION();
 
 
 
@@ -53,13 +53,13 @@ public:
 private:
 	DIRECTIONS _DIRECTION;
 	DIRECTIONS _lastdirection;
-	int _PIN_POT ;
-	int _PIN_MOTOR ;
-	int _PIN_MOTOR_UP ;
-	int _PIN_MOTOR_DOWN  ;
+	byte _PIN_POT ;
+	byte _PIN_MOTOR ;
+	byte _PIN_MOTOR_UP ;
+	byte _PIN_MOTOR_DOWN  ;
 	int  _target;
 
-  void   donot_burn_out_hbridge( int mpin , int mspeed  );
+  void   donot_burn_out_hbridge( byte mpin , byte mspeed  );
 };
 
 
