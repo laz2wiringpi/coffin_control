@@ -93,27 +93,25 @@ void setup()
 
 
 
-	SitMotor.stop_after_run = true;
+	 
 	SitMotor.POT_MIN = 525;
 	SitMotor.POT_MAX = 810;
-	SitMotor.MOTOR_START = 100;
-	SitMotor.POT_DTG = 10;
-	//  SitMotor.MOTOR_MIN = 1;
-	SitMotor.MOTOR_MAX = 140;
-	SitMotor.target_vol = 170;
-	SitMotor.VOL_FACTOR = 0.01;
-	SitMotor.MAX_BREAK = 10;
+	SitMotor.DOWN_SPEED = 140;
+	 
+	SitMotor.UP_SPEED = 140;
+ 
+ 
 
-	DoorMotor.stop_after_run = true;
+ 
 	DoorMotor.POT_MIN = 335;
 	DoorMotor.POT_MAX = 890;
-	DoorMotor.MOTOR_START = 100;
-	DoorMotor.POT_DTG = 10;
-	//  DoorMotor.MOTOR_MIN = 1;
-	DoorMotor.MOTOR_MAX = 200;
-	DoorMotor.target_vol = 180;
-	DoorMotor.VOL_FACTOR = 0.01;
-	DoorMotor.MAX_BREAK = 5;
+	DoorMotor.UP_SPEED = 140;
+ 
+ 
+	DoorMotor.DOWN_SPEED = 140;
+ 
+ 
+ 
 
 #ifdef HAS_IR
 	irrecv.enableIRIn(); //start the receiver
@@ -126,7 +124,7 @@ void doerror(String serror){
 	errorstring = serror;
 
 }
-
+/*
 void   programloop(){
 
 	if (DoorMotor.check() < 0) {
@@ -146,8 +144,8 @@ void   programloop(){
 			programloopstat = pr_situp;
 		}
 		else {
-			if ((DoorMotor.GetDIRECTION() == DIRECTION_OFF) && (DoorMotor.Current_pot() < (DoorMotor.POT_MAX - DoorMotor.POT_DTG))) {
-				docmd('o');
+	 		if ((DoorMotor.GetDIRECTION() == DIRECTION_OFF) && (DoorMotor.Current_pot() < (DoorMotor.POT_MAX - DoorMotor.POT_DTG))) {
+ 			docmd('o');
 
 			}
 		}
@@ -202,7 +200,7 @@ void   programloop(){
 
 	}
 }
-
+*/
 ////////////////////////////////////////////////////// loop
 void loop()
 {
@@ -236,7 +234,7 @@ void loop()
 		}
 		else {
 
-			programloop();
+		//	programloop();
 		}
 
 
@@ -256,7 +254,7 @@ void 	ShowHelp()  {
 	Serial.print("Coffin  ");
 	Serial.println(C_VERSION);
 
-
+	/*
 
 	Serial.println(F("E Stop "));
 	Serial.println("");
@@ -332,7 +330,7 @@ void 	ShowHelp()  {
 	Serial.println(DoorMotor.MAX_BREAK);
 
 
-
+*/
 
 	//	Serial.println("--------------------------------------");
 
@@ -530,35 +528,22 @@ void docmd(char inChar){
 
 	case 'E':
 		errordetect = false;
-		SitMotor.Stop();
-		DoorMotor.Stop();
+		SitMotor.StopMotor();
+		DoorMotor.StopMotor();
 
 
 		inputvalue = NOVALUEINPUT;
 		break;
 	case 'e':
 		errordetect = false;
-		SitMotor.Stop();
-		DoorMotor.Stop();
+		SitMotor.StopMotor();
+		DoorMotor.StopMotor();
 
 
 		inputvalue = NOVALUEINPUT;
 		break;
 
-	case 'R':
-		switch (inputvalue)
-		{
-		case 1:
-			SitMotor.Run(0);
-			break;
-		case 2:
-			DoorMotor.Run(0);
-			break;
-		}
-
-		inputvalue = NOVALUEINPUT;
-
-		break;
+	
 
 
 	case 'U':
@@ -576,19 +561,10 @@ void docmd(char inChar){
 #ifdef DEBUG
 		Serial.print(inputvalue);
 #endif
-		if (DoorMotor.Current_pot() > ((DoorMotor.POT_MIN + DoorMotor.POT_DTG) + 5)) {
-
-			doerror(F("SIT WILL BANG HEAD"));
-
-		}
-		else{
-
-			//  SitMotor.POT_MAX = inputvalue;
-			SitMotor.Settarget_pos(inputvalue);
-			SitMotor.Run(0);
-		}
-
-
+		 
+		SitMotor.Goto(inputvalue);
+	 
+		 
 		inputvalue = NOVALUEINPUT;
 
 
@@ -603,8 +579,8 @@ void docmd(char inChar){
 			inputvalue = SitMotor.POT_MIN;
 		}
 
-		SitMotor.Settarget_pos(inputvalue);
-		SitMotor.Run(0);
+		SitMotor.Goto(inputvalue);
+	 
 
 
 
@@ -621,8 +597,8 @@ void docmd(char inChar){
 			inputvalue = DoorMotor.POT_MAX;
 		}
 		//  DoorMotor.POT_MIN = inputvalue;
-		DoorMotor.Settarget_pos(inputvalue);
-		DoorMotor.Run(0);
+		DoorMotor.Goto(inputvalue);
+		 
 		inputvalue = NOVALUEINPUT;
 
 
@@ -638,16 +614,10 @@ void docmd(char inChar){
 		if (inputvalue == NOVALUEINPUT) {
 			inputvalue = DoorMotor.POT_MIN;
 		}
-		if (SitMotor.Current_pot() > ((SitMotor.POT_MIN + SitMotor.POT_DTG) + 5)) {
-
-
-			doerror(F("DOOR WILL CRUSH ME!"));
-
-		}
-		else{
-			DoorMotor.Settarget_pos(inputvalue);
-			DoorMotor.Run(0);
-		}
+		 
+		DoorMotor.Goto(inputvalue);
+	 
+		 
  
 		inputvalue = NOVALUEINPUT;
 
@@ -657,65 +627,14 @@ void docmd(char inChar){
 
 		//  Serial.println("<num>Y - Door target_vol ");
 
-	case 't':
-
-
-		if (inputvalue == NOVALUEINPUT) {
-			inputvalue = DoorMotor.target_vol;
-		}
-		DoorMotor.target_vol = inputvalue;
-		inputvalue = NOVALUEINPUT;
-
-
-
-		break;
+	 
 
 		//  Serial.println("<num>T - Sit target_vol ");
-	case 'T':
-
-
-		if (inputvalue == NOVALUEINPUT) {
-			inputvalue = SitMotor.target_vol;
-		}
-		SitMotor.target_vol = inputvalue;
-		inputvalue = NOVALUEINPUT;
-
-
-
-		break;
+ 
 
 
 		//  Serial.println("<num>V - Volosity factor SIT ");
-	case 'V':
-
-
-		if (inputvalue != NOVALUEINPUT) {
-
-
-
-			SitMotor.VOL_FACTOR = inputvalue * .01;
-
-		}
-
-		inputvalue = NOVALUEINPUT;
-
-		break;
-
-	case 'v':
-
-
-
-		if (inputvalue != NOVALUEINPUT) {
-
-
-			DoorMotor.VOL_FACTOR = inputvalue * .01;
-
-		}
-
-		inputvalue = NOVALUEINPUT;
-
-		break;
-
+ 
 
 
 	case 'S':
@@ -723,7 +642,7 @@ void docmd(char inChar){
 
 		if (inputvalue != NOVALUEINPUT) {
 
-			SitMotor.MOTOR_START = inputvalue;
+			SitMotor.UP_SPEED  = inputvalue;
 		}
 
 		inputvalue = NOVALUEINPUT;
@@ -735,12 +654,37 @@ void docmd(char inChar){
 
 		if (inputvalue != NOVALUEINPUT) {
 
-			DoorMotor.MOTOR_START = inputvalue;
+			DoorMotor.UP_SPEED = inputvalue;
 		}
 
 		inputvalue = NOVALUEINPUT;
 
 		break;
+
+	case 'T':
+
+
+		if (inputvalue != NOVALUEINPUT) {
+
+			SitMotor.DOWN_SPEED = inputvalue;
+		}
+
+		inputvalue = NOVALUEINPUT;
+
+		break;
+
+	case 't':
+
+
+		if (inputvalue != NOVALUEINPUT) {
+
+			DoorMotor.DOWN_SPEED  = inputvalue;
+		}
+
+		inputvalue = NOVALUEINPUT;
+
+		break;
+
 
 
 	case 'A':
@@ -790,7 +734,8 @@ void docmd(char inChar){
 		inputvalue = NOVALUEINPUT;
 
 		break;
-
+		/*
+	
 	case 'B':
 
 
@@ -815,7 +760,7 @@ void docmd(char inChar){
 
 		break;
 
-
+	*/
 
 
 		//  Serial.println("<num>V - Volosity factor SIT ");
