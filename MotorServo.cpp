@@ -56,12 +56,12 @@ int MotorServo::StopMotor(){
 	analogWrite(_PIN_MOTOR, 0);
 	digitalWrite(_PIN_MOTOR_UP, LOW);
 	digitalWrite(_PIN_MOTOR_DOWN, LOW);
- 
+       _lastdirection = DIRECTION_OFF;
 	return analogRead(_PIN_POT);
 
 }
 
-void  MotorServo::donot_burn_out_hbridge(int mpin, int speed){
+void  MotorServo::donot_burn_out_hbridge(int mpin, int mspeed){
 	analogWrite(_PIN_MOTOR, 0);
 	if (mpin == _PIN_MOTOR_UP) {
 		digitalWrite(_PIN_MOTOR_DOWN, LOW);
@@ -73,7 +73,7 @@ void  MotorServo::donot_burn_out_hbridge(int mpin, int speed){
 		delay(1);
 		digitalWrite(_PIN_MOTOR_DOWN, HIGH);
 	}
-	analogWrite(_PIN_MOTOR, speed);
+	 analogWrite(_PIN_MOTOR, mspeed);
 }
 
 
@@ -135,9 +135,10 @@ int  MotorServo::check(){
 		}
 		else{
 
-		if (_lastdirection != DIRECTION_UP);
-		   donot_burn_out_hbridge(_PIN_MOTOR_UP,UP_SPEED);
-		}
+		    if (_lastdirection != DIRECTION_UP){
+		       donot_burn_out_hbridge(_PIN_MOTOR_UP,UP_SPEED);
+		    }
+                }
 
 		break;
 	case DIRECTION_DOWN:
@@ -148,9 +149,10 @@ int  MotorServo::check(){
 		}
 		else{
 
-			if (_lastdirection != DIRECTION_DOWN);
-			donot_burn_out_hbridge(_PIN_MOTOR_UP, UP_SPEED);
-
+			if (_lastdirection != DIRECTION_DOWN){
+  
+			donot_burn_out_hbridge(_PIN_MOTOR_DOWN, DOWN_SPEED);
+                  }
 		}
 
 		break;

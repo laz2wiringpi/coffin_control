@@ -91,24 +91,45 @@ void setup()
 	serial_otherboard.begin(38400);
 
 
+/*
+  SitMotor.Current_pot :515
 
+      SitMotor.UP_SPEED  :110
+
+      SitMotor.DOWN_SPEED  :80
+
+      SitMotor.POT_MAX     :810
+
+      SitMotor.POT_MIN     :525
+
+      DoorMotor.Current_pot:101
+
+      DoorMotor.UPSPEED :190
+
+      DoorMotor.DOWNSPEED :55
+
+      DoorMotor.POT_MAX    :690
+
+      DoorMotor.POT_MIN    :120
+
+*/
 
 	 
 	SitMotor.POT_MIN = 525;
 	SitMotor.POT_MAX = 810;
-	SitMotor.DOWN_SPEED = 140;
+	SitMotor.DOWN_SPEED = 70;
 	 
-	SitMotor.UP_SPEED = 140;
+	SitMotor.UP_SPEED = 110;
  
  
 
  
-	DoorMotor.POT_MIN = 335;
-	DoorMotor.POT_MAX = 890;
-	DoorMotor.UP_SPEED = 140;
+	DoorMotor.POT_MIN = 120;
+	DoorMotor.POT_MAX = 690;
+	DoorMotor.UP_SPEED = 190;
  
  
-	DoorMotor.DOWN_SPEED = 140;
+	DoorMotor.DOWN_SPEED = 55;
  
  
  
@@ -254,7 +275,7 @@ void 	ShowHelp()  {
 	Serial.print("Coffin  ");
 	Serial.println(C_VERSION);
 
-	/*
+	
 
 	Serial.println(F("E Stop "));
 	Serial.println("");
@@ -288,14 +309,12 @@ void 	ShowHelp()  {
 	Serial.print(F("      SitMotor.Current_pot :"));
 	Serial.println(SitMotor.Current_pot());
 
-	Serial.print(F("      SitMotor.target_vol  :"));
-	Serial.println(SitMotor.target_vol);
+	Serial.print(F("      SitMotor.UP_SPEED  :"));
+	Serial.println(SitMotor.UP_SPEED);
 
-	Serial.print(F("      SitMotor.VOL_FACTOR  :"));
-	Serial.println(SitMotor.VOL_FACTOR);
-
-	Serial.print(F("      SitMotor.MOTOR_START :"));
-	Serial.println(SitMotor.MOTOR_START);
+	Serial.print(F("      SitMotor.DOWN_SPEED  :"));
+	Serial.println(SitMotor.DOWN_SPEED);
+ 
 
 	Serial.print(F("      SitMotor.POT_MAX     :"));
 	Serial.println(SitMotor.POT_MAX);
@@ -303,34 +322,30 @@ void 	ShowHelp()  {
 	Serial.print(F("      SitMotor.POT_MIN     :"));
 	Serial.println(SitMotor.POT_MIN);
 
-	Serial.print(F("    SitMotor.MAX_BREAK    :"));
-	Serial.println(SitMotor.MAX_BREAK);
+	 
 
 
 	Serial.print(F("      DoorMotor.Current_pot:"));
 	Serial.println(DoorMotor.Current_pot());
 
-	Serial.print(F("      DoorMotor.target_vol :"));
-	Serial.println(DoorMotor.target_vol);
+	Serial.print(F("      DoorMotor.UPSPEED :"));
+	Serial.println(DoorMotor.UP_SPEED);
 
 
-	Serial.print(F("      DoorMotor.VOL_FACTOR :"));
-	Serial.println(DoorMotor.VOL_FACTOR);
+	Serial.print(F("      DoorMotor.DOWNSPEED :"));
+	Serial.println(DoorMotor.DOWN_SPEED);
 
-	Serial.print(F("      DoorMotor.MOTOR_START:"));
-	Serial.println(DoorMotor.MOTOR_START);
+	 
 
 	Serial.print(F("      DoorMotor.POT_MAX    :"));
 	Serial.println(DoorMotor.POT_MAX);
 
 	Serial.print(F("      DoorMotor.POT_MIN    :"));
 	Serial.println(DoorMotor.POT_MIN);
-
-	Serial.print(F("    DoorMotor.MAX_BREAK    :"));
-	Serial.println(DoorMotor.MAX_BREAK);
+ 
 
 
-*/
+ 
 
 	//	Serial.println("--------------------------------------");
 

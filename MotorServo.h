@@ -58,7 +58,7 @@ private:
 	int _PIN_MOTOR_DOWN  ;
 	int  _target;
 
-  void   donot_burn_out_hbridge( int mpin , int speed  );
+  void   donot_burn_out_hbridge( int mpin , int mspeed  );
 };
 
 
