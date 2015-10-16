@@ -44,6 +44,11 @@ MotorServo::MotorServo(int aPIN_POT,
 	digitalWrite(_PIN_MOTOR_DOWN, LOW);
 }
 
+ 
+int MotorServo::GetDIRECTION(){
+	return _lastdirection;
+
+}
 
 ////////////////////////////////////////
 int MotorServo::StopMotor(){

@@ -44,7 +44,8 @@ public:
 	 
 
 		int Current_pot();
-		
+		int GetDIRECTION();
+
 
 
    
