@@ -42,7 +42,7 @@ MotorServo::MotorServo(byte aPIN_POT,
 
 	pinMode(_PIN_MOTOR_DOWN, OUTPUT);
 	digitalWrite(_PIN_MOTOR_DOWN, LOW);
-	timepermove = 2000;
+	timepermove = 16000;
 }
 
 
@@ -130,7 +130,7 @@ int  MotorServo::check(){
 
 	int aCurrent_pot = Current_pot();
 	unsigned long acurrenttime = micros();
-	int moved_pot = _lastpot - aCurrent_pot;
+	int moved_pot = aCurrent_pot - _lastpot ;
 
 	switch (_DIRECTION)
 	{
@@ -155,23 +155,30 @@ int  MotorServo::check(){
 			}
 			else{
 				// speed 2
+
 				if (moved_pot > 0){
-					if ((_last_time - acurrenttime) < timepermove + 500){
-						_last_speed + 5;
+					if ((acurrenttime - _last_time ) < timepermove + 1000){
+						_last_speed = _last_speed + 1;
 						analogWrite(_PIN_MOTOR, _last_speed);
 						 
 					}
-					if ((_last_time - acurrenttime) > timepermove + 500){
-						_last_speed -5 ;
+					if ((acurrenttime - _last_time ) > timepermove + 1000){
+					_last_speed = _last_speed - 1;
 						analogWrite(_PIN_MOTOR, _last_speed);
 						 
 					}
+         #ifdef DEBUG
+           
+        Serial.print("  moved_pot  ");
+          Serial.print( moved_pot );  
+         Serial.print("acurrenttime - _last_time  ");
+          Serial.print(acurrenttime - _last_time );
+         Serial.print(" _last_speed  ");
+          Serial.println(_last_speed);
+#endif
 					_last_time = acurrenttime;
 					_lastpot = aCurrent_pot;
-#ifdef DEBUG
-					Serial.print("_last_speed  ");
-					Serial.println(_last_speed);
-#endif
+ 
 
 				}
 			}
@@ -196,24 +203,29 @@ int  MotorServo::check(){
 			else{
 				// speed 2
 				if (moved_pot < 0){
-					if ((_last_time - acurrenttime) < timepermove + 500){
-						_last_speed + 5;
+					if ((acurrenttime - _last_time ) < timepermove + 1000){
+						_last_speed = _last_speed + 1;
 						analogWrite(_PIN_MOTOR, _last_speed);
 
 					}
-					if ((_last_time - acurrenttime) > timepermove + 500){
-						_last_speed - 5;
+					if ((acurrenttime - _last_time ) > timepermove + 1000){
+						_last_speed = _last_speed - 1;
 						analogWrite(_PIN_MOTOR, _last_speed);
 
 					}
-					_last_time = acurrenttime;
-					_lastpot = aCurrent_pot;
-#ifdef DEBUG
-					Serial.print("_last_speed  ");
-					Serial.println(_last_speed);
+					
+         #ifdef DEBUG
+         Serial.print("  moved_pot  ");
+          Serial.print( moved_pot );  
+         Serial.print("acurrenttime - _last_time  ");
+          Serial.print(acurrenttime - _last_time );
+         Serial.print(" _last_speed  ");
+          Serial.println(_last_speed);
 #endif
-
+_last_time = acurrenttime;
+          _lastpot = aCurrent_pot;
 				}
+ 
 			}
 		}
 
