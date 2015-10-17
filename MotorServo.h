@@ -45,7 +45,7 @@ public:
 
 	int Current_pot();
 	DIRECTIONS GetDIRECTION();
-	int timepermove;
+	//int timepermove;
 
 
 
@@ -60,9 +60,9 @@ private:
 	int  _target;
 	
 
-	int  _lastpot;
-	unsigned long _last_time;
-	int _last_speed;
+//	int  _lastpot;
+//	unsigned long _last_time;
+//	int _last_speed;
 
 	void   donot_burn_out_hbridge(byte mpin, byte mspeed);
 };
