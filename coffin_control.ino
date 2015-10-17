@@ -290,8 +290,7 @@ void doerror(String serror){
 }
 
 void   programloop(){
-	int SitMotor_Current_pot;
-	int DoorMotor_Current_pot;
+	
 
 	if (DoorMotor.check() < 0) {
 		doerror(F("DoorMotor FAIL"));
@@ -300,12 +299,15 @@ void   programloop(){
 		doerror(F("SitMotor FAIL"));
 	}
 
+    int DoorMotor_Current_pot = DoorMotor.Current_pot();
+	int SitMotor_Current_pot = SitMotor.Current_pot();
+
 	if (errordetect) return;
 
 	switch (programloopstat){
 	case pr_open:
 
-		DoorMotor_Current_pot = DoorMotor.Current_pot();
+	 
 
 		if (DoorMotor_Current_pot > (DoorMotor.POT_MAX - 5)) {
 			programloopstat = pr_situp;
@@ -318,8 +320,8 @@ void   programloop(){
 		}
 		break;
 	case pr_situp:
-		DoorMotor_Current_pot = DoorMotor.Current_pot();
-		SitMotor_Current_pot = SitMotor.Current_pot();
+	 
+	 
 
 		if (DoorMotor_Current_pot < (DoorMotor.POT_MAX - 5)) {
 			programloopstat = pr_open;
@@ -337,10 +339,8 @@ void   programloop(){
 		break;
 
 	case pr_close:
-		DoorMotor_Current_pot = DoorMotor.Current_pot();
-		SitMotor_Current_pot = SitMotor.Current_pot();
-
-		if (SitMotor_Current_pot > (SitMotor.POT_MIN + 5)) {
+	
+		if (SitMotor_Current_pot > (SitMotor.POT_MIN + 30)) {
 			programloopstat = pr_sitdown;
 			return;
 		}
@@ -356,7 +356,7 @@ void   programloop(){
 		}
 		break;
 	case pr_sitdown:
-		SitMotor_Current_pot = SitMotor.Current_pot();
+	 
 		if (SitMotor_Current_pot < (SitMotor.POT_MIN + 5)) {
 			programloopstat = pr_close;
 		}
@@ -860,12 +860,15 @@ void docmd(char inChar){
 		if (inputvalue == NOVALUEINPUT) {
 			inputvalue = DoorMotor.POT_MIN;
 		}
-		if (SitMotor.Current_pot() < (SitMotor.POT_MIN + 5)) {
+		if (SitMotor.Current_pot() > (SitMotor.POT_MIN + 20)) {
 
-			DoorMotor.Goto(inputvalue);
+#ifdef DEBUG
+			Serial.print(F("sit will bang head"));
+#endif
 		}
 		else{
 
+			DoorMotor.Goto(inputvalue);
 		}
 
 
