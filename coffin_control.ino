@@ -5,7 +5,7 @@
 #define MEMSHOWHELP
 
 #ifdef HAS_SoftSer
-   #include <SoftwareSerial.h>
+#include <SoftwareSerial.h>
 #endif
 
 
@@ -17,15 +17,15 @@
 #include "MotorServo.h"
 
 #include "Fog.h"
- 
+
 #include "LEDFader.h" 
 #ifdef HAS_IR
- #include "IRremote.h"
+#include "IRremote.h"
 #endif
 
 
 #ifdef DEBUG 
- 
+
 #endif
 
 
@@ -46,7 +46,7 @@
 #define     eadd_fog_delay_on_time      15
 //                                  lsb 16
 #define     eadd_fog_on                 17
-      
+
 // next is 13    
 
 
@@ -82,7 +82,7 @@ Fog FogMachine(20);
 
 LEDFader LedMain;
 int LedMaindirection = LED_DIR_UP;
-  
+
 #define rxPin 19
 #define txPin 18
 
@@ -120,12 +120,12 @@ int testloop = 1;
 
 
 enum pr_stats {
-  pr_none,
-  pr_open,
-  pr_situp,
-  pr_close,
-  pr_sitdown,
-  
+	pr_none,
+	pr_open,
+	pr_situp,
+	pr_close,
+	pr_sitdown,
+
 };
 
 pr_stats programloopstat = pr_none;
@@ -133,59 +133,59 @@ pr_stats programloopstat = pr_none;
 
 
 void ledloop() {
-  LedMain.update();
+	LedMain.update();
 
-  // LED no longer fading, switch direction
-  if (!LedMain.is_fading()) {
+	// LED no longer fading, switch direction
+	if (!LedMain.is_fading()) {
 
-    // Fade down
-    if (LedMaindirection == LED_DIR_UP) {
-      LedMain.fade(0, FADE_TIME);
-      LedMaindirection = LED_DIR_DOWN;
-    }
-    // Fade up
-    else {
-      LedMain.fade(255, FADE_TIME);
-      LedMaindirection = LED_DIR_UP;
-    }
-  }
+		// Fade down
+		if (LedMaindirection == LED_DIR_UP) {
+			LedMain.fade(0, FADE_TIME);
+			LedMaindirection = LED_DIR_DOWN;
+		}
+		// Fade up
+		else {
+			LedMain.fade(255, FADE_TIME);
+			LedMaindirection = LED_DIR_UP;
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////
 void write_to_eprom(){
 
-  #ifdef HAS_EEPROM
-   byte savedummyvar = 1;
-  
-   
-    EEPROM.put(0,savedummyvar);
-    EEPROM.put(eadd_SitMotor_POT_MIN,SitMotor.POT_MIN);
-    EEPROM.put(eadd_SitMotor_POT_MAX,SitMotor.POT_MAX);
-    EEPROM.put(eadd_SitMotor_DOWN_SPEED,SitMotor.DOWN_SPEED);
-    EEPROM.put(eadd_SitMotor_UP_SPEED,SitMotor.UP_SPEED);
- 
-    
-    
-    EEPROM.put(eadd_DoorMotor_POT_MIN,DoorMotor.POT_MIN);
-    EEPROM.put(eadd_DoorMotor_POT_MAX,DoorMotor.POT_MAX);
-    EEPROM.put(eadd_DoorMotor_DOWN_SPEED,DoorMotor.DOWN_SPEED);
-    EEPROM.put(eadd_DoorMotor_UP_SPEED,DoorMotor.UP_SPEED);
+#ifdef HAS_EEPROM
+	byte savedummyvar = 1;
 
-    EEPROM.put(eadd_delay_fog,FogMachine.getdelay_fogsec());
-    EEPROM.put(eadd_fog_delay_on_time,FogMachine.getdelay_on_timesec());
-    EEPROM.put(eadd_fog_on,int(FogMachine.isfogstatuson()));
-   
- #endif
+
+	EEPROM.put(0, savedummyvar);
+	EEPROM.put(eadd_SitMotor_POT_MIN, SitMotor.POT_MIN);
+	EEPROM.put(eadd_SitMotor_POT_MAX, SitMotor.POT_MAX);
+	EEPROM.put(eadd_SitMotor_DOWN_SPEED, SitMotor.DOWN_SPEED);
+	EEPROM.put(eadd_SitMotor_UP_SPEED, SitMotor.UP_SPEED);
+
+
+
+	EEPROM.put(eadd_DoorMotor_POT_MIN, DoorMotor.POT_MIN);
+	EEPROM.put(eadd_DoorMotor_POT_MAX, DoorMotor.POT_MAX);
+	EEPROM.put(eadd_DoorMotor_DOWN_SPEED, DoorMotor.DOWN_SPEED);
+	EEPROM.put(eadd_DoorMotor_UP_SPEED, DoorMotor.UP_SPEED);
+
+	EEPROM.put(eadd_delay_fog, FogMachine.getdelay_fogsec());
+	EEPROM.put(eadd_fog_delay_on_time, FogMachine.getdelay_on_timesec());
+	EEPROM.put(eadd_fog_on, int(FogMachine.isfogstatuson()));
+
+#endif
 }
- 
+
 ////////////////////////////////////////////////////// setup
 void setup()
 {
- 
- 
- 
-  LedMain = LEDFader(LED_PIN);
-  LedMain.fade(255, FADE_TIME);
+
+
+
+	LedMain = LEDFader(LED_PIN);
+	LedMain.fade(255, FADE_TIME);
 
 
 	errorstring.reserve(40);
@@ -195,9 +195,9 @@ void setup()
 	pinMode(rxPin, INPUT);
 	pinMode(txPin, OUTPUT);
 	// comport 
- #ifdef HAS_SoftSer
+#ifdef HAS_SoftSer
 	serial_otherboard.begin(38400);
- #endif
+#endif
 
 	/*
 	  SitMotor.Current_pot :515
@@ -245,30 +245,30 @@ void setup()
 	}
 	else{
 
-      int tmpint = 0;
-      int tmpint2 = 0;
-        EEPROM.get(eadd_SitMotor_POT_MIN,SitMotor.POT_MIN);
-        EEPROM.get(eadd_SitMotor_POT_MAX,SitMotor.POT_MAX );
-        EEPROM.get(eadd_SitMotor_UP_SPEED,SitMotor.UP_SPEED );
-        EEPROM.get(eadd_SitMotor_DOWN_SPEED,SitMotor.DOWN_SPEED );
-        
-        EEPROM.get(eadd_DoorMotor_POT_MIN, DoorMotor.POT_MIN);
-        EEPROM.get(eadd_DoorMotor_POT_MAX,DoorMotor.POT_MAX);
-        EEPROM.get(eadd_DoorMotor_UP_SPEED,DoorMotor.UP_SPEED); 
-        EEPROM.get(eadd_DoorMotor_DOWN_SPEED,DoorMotor.DOWN_SPEED);
+		int tmpint = 0;
+		int tmpint2 = 0;
+		EEPROM.get(eadd_SitMotor_POT_MIN, SitMotor.POT_MIN);
+		EEPROM.get(eadd_SitMotor_POT_MAX, SitMotor.POT_MAX);
+		EEPROM.get(eadd_SitMotor_UP_SPEED, SitMotor.UP_SPEED);
+		EEPROM.get(eadd_SitMotor_DOWN_SPEED, SitMotor.DOWN_SPEED);
 
-        EEPROM.get(eadd_delay_fog,tmpint );
-        EEPROM.get(eadd_fog_delay_on_time,tmpint2 );
-          
-        FogMachine.setfogsec(tmpint,tmpint2);
-        
+		EEPROM.get(eadd_DoorMotor_POT_MIN, DoorMotor.POT_MIN);
+		EEPROM.get(eadd_DoorMotor_POT_MAX, DoorMotor.POT_MAX);
+		EEPROM.get(eadd_DoorMotor_UP_SPEED, DoorMotor.UP_SPEED);
+		EEPROM.get(eadd_DoorMotor_DOWN_SPEED, DoorMotor.DOWN_SPEED);
 
-       
-        EEPROM.get(eadd_fog_on,tmpint );
-         if (tmpint != 0)    
-            FogMachine.setfogstatuson();
-            
-     
+		EEPROM.get(eadd_delay_fog, tmpint);
+		EEPROM.get(eadd_fog_delay_on_time, tmpint2);
+
+		FogMachine.setfogsec(tmpint, tmpint2);
+
+
+
+		EEPROM.get(eadd_fog_on, tmpint);
+		if (tmpint != 0)
+			FogMachine.setfogstatuson();
+
+
 
 
 	}
@@ -290,9 +290,9 @@ void doerror(String serror){
 }
 
 void   programloop(){
-  int SitMotor_Current_pot;
-  int DoorMotor_Current_pot;
-  
+	int SitMotor_Current_pot;
+	int DoorMotor_Current_pot;
+
 	if (DoorMotor.check() < 0) {
 		doerror(F("DoorMotor FAIL"));
 	}
@@ -305,8 +305,8 @@ void   programloop(){
 	switch (programloopstat){
 	case pr_open:
 
-    DoorMotor_Current_pot = DoorMotor.Current_pot();
-    
+		DoorMotor_Current_pot = DoorMotor.Current_pot();
+
 		if (DoorMotor_Current_pot > (DoorMotor.POT_MAX - 5)) {
 			programloopstat = pr_situp;
 		}
@@ -318,14 +318,14 @@ void   programloop(){
 		}
 		break;
 	case pr_situp:
-    DoorMotor_Current_pot = DoorMotor.Current_pot();
-    SitMotor_Current_pot = SitMotor.Current_pot();
-    
+		DoorMotor_Current_pot = DoorMotor.Current_pot();
+		SitMotor_Current_pot = SitMotor.Current_pot();
+
 		if (DoorMotor_Current_pot < (DoorMotor.POT_MAX - 5)) {
 			programloopstat = pr_open;
 			return;
 		}
-		if (SitMotor_Current_pot > (SitMotor.POT_MAX - 5)) {
+		if (SitMotor_Current_pot >(SitMotor.POT_MAX - 5)) {
 			programloopstat = pr_none;
 		}
 		else {
@@ -337,10 +337,10 @@ void   programloop(){
 		break;
 
 	case pr_close:
-    DoorMotor_Current_pot = DoorMotor.Current_pot();
-    SitMotor_Current_pot = SitMotor.Current_pot();
-    
-		if ( SitMotor_Current_pot > (SitMotor.POT_MIN + 5)) {
+		DoorMotor_Current_pot = DoorMotor.Current_pot();
+		SitMotor_Current_pot = SitMotor.Current_pot();
+
+		if (SitMotor_Current_pot > (SitMotor.POT_MIN + 5)) {
 			programloopstat = pr_sitdown;
 			return;
 		}
@@ -349,19 +349,19 @@ void   programloop(){
 			programloopstat = pr_none;
 		}
 		else {
-			if ((DoorMotor.GetDIRECTION() == DIRECTION_OFF) && (DoorMotor_Current_pot > (DoorMotor.POT_MIN - 5))) {
+			if ((DoorMotor.GetDIRECTION() == DIRECTION_OFF) && (DoorMotor_Current_pot >(DoorMotor.POT_MIN - 5))) {
 				docmd('c');
 
 			}
 		}
 		break;
 	case pr_sitdown:
-   SitMotor_Current_pot = SitMotor.Current_pot();
+		SitMotor_Current_pot = SitMotor.Current_pot();
 		if (SitMotor_Current_pot < (SitMotor.POT_MIN + 5)) {
 			programloopstat = pr_close;
 		}
 		else {
-			if ((SitMotor.GetDIRECTION() == DIRECTION_OFF) && (SitMotor_Current_pot > (SitMotor.POT_MAX - 5))) {
+			if ((SitMotor.GetDIRECTION() == DIRECTION_OFF) && (SitMotor_Current_pot >(SitMotor.POT_MAX - 5))) {
 				docmd('D');
 
 			}
@@ -403,8 +403,8 @@ void loop()
 				doerror(F("SitMotor FAIL"));
 			}
 
-      FogMachine.check();
-      
+			FogMachine.check();
+
 		}
 		else {
 
@@ -430,7 +430,7 @@ void 	ShowHelp()  {
 
 
 
-	Serial.println(F("E Stop "));
+	Serial.println(F("     E Stop "));
 	Serial.println("");
 	Serial.println(F("<num>U    - SIT up POT_MAX "));
 	Serial.println(F("<num>D    - SIT up POT_Min "));
@@ -445,15 +445,15 @@ void 	ShowHelp()  {
 	Serial.println(F("<num>A(a) - Pot MAX "));
 	Serial.println(F("<num>I(i) - Pot MIN "));
 
-  Serial.print(F(" n      FOG NOW    :"));
-  Serial.print(F(" m      FOG start   :"));
-  Serial.print(F(" b      FOG off   :"));
-  Serial.print(F(" ,      FOG adelay_fogsec   :"));
-  Serial.print(F(" .      FOG adelay_on_timesec   :"));
-    
-  Serial.print(F(" Z      WRITE EPROM    :"));
+	Serial.println(F("     n      FOG NOW "));
+	Serial.println(F("     m      FOG start"));
+	Serial.println(F("     b      FOG off  "));
+	Serial.println(F("<num>.      FOG adelay_fogsec "));
+	Serial.println(F("<num>,      FOG adelay_on_timesec   "));
 
- Serial.println(F("--------------------------------------"));
+	Serial.println(F("     Z      WRITE EPROM    :"));
+
+	Serial.println(F("--------------------------------------"));
 
 	Serial.print(F("      SitMotor.Current_pot :"));
 	Serial.println(SitMotor.Current_pot());
@@ -497,17 +497,17 @@ void 	ShowHelp()  {
 	Serial.println(SitMotor.GetDIRECTION());
 
 
-  Serial.print(F("      FOG      :"));
-  Serial.println(int(FogMachine.isfogstatuson()));
+	Serial.print(F("      FOG      :"));
+	Serial.println(int(FogMachine.isfogstatuson()));
 
- 
-   Serial.print(F("      FOG getdelay_fogsec     :"));
-  Serial.println(int(FogMachine.getdelay_fogsec()));
-  
-    Serial.print(F("      FOG   getdelay_on_timesec   :"));
-  Serial.println(int(FogMachine.getdelay_on_timesec()));
-   
-   
+
+	Serial.print(F("      FOG getdelay_fogsec     :"));
+	Serial.println(int(FogMachine.getdelay_fogsec()));
+
+	Serial.print(F("      FOG   getdelay_on_timesec   :"));
+	Serial.println(int(FogMachine.getdelay_on_timesec()));
+
+
 
 
 	//	Serial.println("--------------------------------------");
@@ -528,7 +528,7 @@ void serialEventotherboard() {
 
 
 #ifdef DEBUG
-		Serial.print1("NEW otherboard :  ");
+		Serial.print("NEW otherboard :  ");
 		Serial.println(inChar);
 #endif
 
@@ -540,8 +540,8 @@ void serialEventotherboard() {
 }
 ////////////////////////////////////////////////////// doIRdata
 void doIRdata() {
-  #ifdef HAS_IR
- 
+#ifdef HAS_IR
+
 
 	if (irrecv.decode(&results)) { //we have received an IR
 		int IRDIGIT = NOVALUEINPUT;
@@ -596,8 +596,8 @@ void doIRdata() {
 			testloop = false;
 			programloopstat = pr_situp;
 #ifdef DEBUG
-      Serial.println("*");
-      Serial.println(IRvalue);
+			Serial.println("*");
+			Serial.println(IRvalue);
 #endif
 
 			IRvalue = NOVALUEINPUT;
@@ -606,11 +606,11 @@ void doIRdata() {
 		case 0X3EC3FC1B: //////////////////////////////////////////////////////// #
 			testloop = false;
 			programloopstat = pr_sitdown;
-     #ifdef DEBUG
-      Serial.println("#");
-      Serial.println(IRvalue);
+#ifdef DEBUG
+			Serial.println("#");
+			Serial.println(IRvalue);
 #endif
- 
+
 			IRvalue = NOVALUEINPUT;
 			break;
 
@@ -620,7 +620,7 @@ void doIRdata() {
 #ifdef DEBUG
 			Serial.println("UP");
 			Serial.println(IRvalue);
-      #endif
+#endif
 			IRvalue = NOVALUEINPUT;
 			break;
 
@@ -630,7 +630,7 @@ void doIRdata() {
 #ifdef DEBUG 
 			Serial.println("DOWN");
 			Serial.println(IRvalue);
-      #endif
+#endif
 			IRvalue = NOVALUEINPUT;
 			break;
 
@@ -640,7 +640,7 @@ void doIRdata() {
 #ifdef DEBUG
 			Serial.println("LEFT");
 			Serial.println(IRvalue);
-      #endif
+#endif
 			IRvalue = NOVALUEINPUT;
 			break;
 
@@ -648,65 +648,65 @@ void doIRdata() {
 			testloop = true;
 			docmd('o');
 #ifdef DEBUG
-Serial.println("RIGHT");
+			Serial.println("RIGHT");
 			Serial.println(IRvalue);
-      #endif
+#endif
 			IRvalue = NOVALUEINPUT;
 			break;
 
 		case 0XD7E84B1B: //////////////////////////////////////////////////////// OK
-      
-			 
-			switch(IRvalue) {
-        case NOVALUEINPUT:
-        testloop = true;
-        docmd('E');  
-        break;
-
-        case 1:
-        testloop = true;
-        docmd('n');  
-        break;
-
-         case 2:
-        testloop = true;
-        docmd('m');  
-        break;
-
-        case 3:
-        testloop = true;
-        docmd('b');  
-        break;
 
 
-        case 4:
-        testloop = true;
-        docmd('f');  
-        break;
-        
-        case 5:
-        testloop = true;
-        docmd('g');  
-        break;
+			switch (IRvalue) {
+			case NOVALUEINPUT:
+				testloop = true;
+				docmd('E');
+				break;
+
+			case 1:
+				testloop = true;
+				docmd('n');
+				break;
+
+			case 2:
+				testloop = true;
+				docmd('m');
+				break;
+
+			case 3:
+				testloop = true;
+				docmd('b');
+				break;
+
+
+			case 4:
+				testloop = true;
+				docmd('f');
+				break;
+
+			case 5:
+				testloop = true;
+				docmd('g');
+				break;
 			}
-      
-     
-			 
+
+
+
 #ifdef DEBUG
-      
+
 			Serial.println("OK");
 
 			Serial.println(IRvalue);
-      #endif
+#endif
 			IRvalue = NOVALUEINPUT;
 
 			break;
 
 		default:
 			// if nothing else matches, do the default
-      #ifdef DEBUG
+#ifdef DEBUG
 			Serial.println(results.value, HEX); //display HEX
-          #endif
+#endif
 			break;
 		}
 		if (IRDIGIT != NOVALUEINPUT) {
@@ -714,9 +714,9 @@ Serial.println("RIGHT");
 				IRvalue = 0;
 			}
 			IRvalue = (10 * IRvalue) + IRDIGIT;
-          #ifdef DEBUG
+#ifdef DEBUG
 			Serial.println(IRvalue);
-      #endif
+#endif
 		}
 		irrecv.resume(); //next value
 	}
@@ -755,19 +755,19 @@ void docmd(char inChar){
 		break;
 	case 'H':
 		ShowHelp();
- #ifdef HAS_SoftSer
-    serial_otherboard.println('H');
+#ifdef HAS_SoftSer
+		serial_otherboard.println('H');
 #endif      
 
 
 		inputvalue = NOVALUEINPUT;
 		break;
 
-  case 'Z':
-    write_to_eprom();
-    inputvalue = NOVALUEINPUT;
-    break;
-    
+	case 'Z':
+		write_to_eprom();
+		inputvalue = NOVALUEINPUT;
+		break;
+
 	case 'E':
 		errordetect = false;
 		SitMotor.StopMotor();
@@ -987,68 +987,68 @@ void docmd(char inChar){
 		break;
 
 
-//////////////////////////////
+		//////////////////////////////
 
-  case 'n':
- 
-
-       FogMachine.FogNOW();
-    
-    inputvalue = NOVALUEINPUT;
-
-    break;
-    case 'b':
- 
-     FogMachine.Stop();
-
-    inputvalue = NOVALUEINPUT;
-
-    break;  
-  case 'm':
- 
-  
-           //  FogMachine.FogStart(FogMachine.getdelay_fogsec() ,FogMachine.getdelay_on_timesec());
-     FogMachine.FogStart(0,0);
-    
-    inputvalue = NOVALUEINPUT;
-
-    break;
-
-      case ',':
- 
-
-       FogMachine.setfogsec(0,inputvalue);
-    
-    inputvalue = NOVALUEINPUT;
-
-    break;
-          case '.':
- 
-
-       FogMachine.setfogsec(inputvalue,0);
-    
-    inputvalue = NOVALUEINPUT;
-
-    break;
+	case 'n':
 
 
-    case 'f':
- 
+		FogMachine.FogNOW();
 
-        LedMain.set_value(255);
-    
-    inputvalue = NOVALUEINPUT;
+		inputvalue = NOVALUEINPUT;
 
-    break;
-    
-    case 'g':
- 
+		break;
+	case 'b':
 
-        LedMain.set_value(0);
-    
-    inputvalue = NOVALUEINPUT;
+		FogMachine.Stop();
 
-    break;
+		inputvalue = NOVALUEINPUT;
+
+		break;
+	case 'm':
+
+
+		//  FogMachine.FogStart(FogMachine.getdelay_fogsec() ,FogMachine.getdelay_on_timesec());
+		FogMachine.FogStart(0, 0);
+
+		inputvalue = NOVALUEINPUT;
+
+		break;
+
+	case ',':
+
+
+		FogMachine.setfogsec(0, inputvalue);
+
+		inputvalue = NOVALUEINPUT;
+
+		break;
+	case '.':
+
+
+		FogMachine.setfogsec(inputvalue, 0);
+
+		inputvalue = NOVALUEINPUT;
+
+		break;
+
+
+	case 'f':
+
+
+		LedMain.set_value(255);
+
+		inputvalue = NOVALUEINPUT;
+
+		break;
+
+	case 'g':
+
+
+		LedMain.set_value(0);
+
+		inputvalue = NOVALUEINPUT;
+
+		break;
 
 		// off to other board serial1 .. 
 
@@ -1059,7 +1059,7 @@ void docmd(char inChar){
 			serial_otherboard.print(inputvalue);
 		}
 
-    serial_otherboard.println(inChar);
+		serial_otherboard.println(inChar);
 #endif   
 
 		inputvalue = NOVALUEINPUT;

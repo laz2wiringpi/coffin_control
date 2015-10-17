@@ -14,17 +14,17 @@ MotorServo::MotorServo(byte aPIN_POT,
 	byte aPIN_MOTOR_DOWN)
 {
 
-	 
+
 
 	POT_MIN = 500;
 	POT_MAX = 800;
 	UP_SPEED = 100;
- 
-	DOWN_SPEED  = 250;
-	 
+
+	DOWN_SPEED = 250;
+
 	//MAX_BREAK = 5;
- 
-	  
+
+
 
 
 	_PIN_POT = aPIN_POT;
@@ -42,9 +42,10 @@ MotorServo::MotorServo(byte aPIN_POT,
 
 	pinMode(_PIN_MOTOR_DOWN, OUTPUT);
 	digitalWrite(_PIN_MOTOR_DOWN, LOW);
+	timepermove = 2000;
 }
 
- 
+
 DIRECTIONS MotorServo::GetDIRECTION(){
 	return _lastdirection;
 
@@ -61,7 +62,7 @@ int MotorServo::StopMotor(){
 	analogWrite(_PIN_MOTOR, 0);
 	digitalWrite(_PIN_MOTOR_UP, LOW);
 	digitalWrite(_PIN_MOTOR_DOWN, LOW);
-       _lastdirection = DIRECTION_OFF;
+	_lastdirection = DIRECTION_OFF;
 	return analogRead(_PIN_POT);
 
 }
@@ -78,7 +79,9 @@ void  MotorServo::donot_burn_out_hbridge(byte mpin, byte mspeed){
 		delay(1);
 		digitalWrite(_PIN_MOTOR_DOWN, HIGH);
 	}
-	 analogWrite(_PIN_MOTOR, mspeed);
+	analogWrite(_PIN_MOTOR, mspeed);
+	_last_speed = mspeed;
+
 }
 
 
@@ -86,7 +89,7 @@ void  MotorServo::donot_burn_out_hbridge(byte mpin, byte mspeed){
 int MotorServo::Goto(int target)  {
 
 
-	 
+
 
 
 	analogWrite(_PIN_MOTOR, 0);
@@ -114,16 +117,20 @@ int MotorServo::Goto(int target)  {
 	else if (target < pospot){
 
 
-		_DIRECTION = DIRECTION_DOWN ;
+		_DIRECTION = DIRECTION_DOWN;
 	}
 
 	return	_target;
 
 
-	 
+
 }
 ////////////////////////////////////////
 int  MotorServo::check(){
+
+	int aCurrent_pot = Current_pot();
+	unsigned long acurrenttime = micros();
+	int moved_pot = _lastpot - aCurrent_pot;
 
 	switch (_DIRECTION)
 	{
@@ -134,45 +141,96 @@ int  MotorServo::check(){
 		break;
 
 	case DIRECTION_UP:
-		if (Current_pot() > POT_MAX) {
+		if (aCurrent_pot > POT_MAX) {
 			StopMotor();
-			return 0; 
+			return 0;
 		}
 		else{
 
-		    if (_lastdirection != DIRECTION_UP){
-		       donot_burn_out_hbridge(_PIN_MOTOR_UP,UP_SPEED);
-		    }
-                }
+			if (_lastdirection != DIRECTION_UP){
+				donot_burn_out_hbridge(_PIN_MOTOR_UP, UP_SPEED);
+				_last_time = acurrenttime;
+				_lastpot = aCurrent_pot;
+
+			}
+			else{
+				// speed 2
+				if (moved_pot > 0){
+					if ((_last_time - acurrenttime) < timepermove + 500){
+						_last_speed + 5;
+						analogWrite(_PIN_MOTOR, _last_speed);
+						 
+					}
+					if ((_last_time - acurrenttime) > timepermove + 500){
+						_last_speed -5 ;
+						analogWrite(_PIN_MOTOR, _last_speed);
+						 
+					}
+					_last_time = acurrenttime;
+					_lastpot = aCurrent_pot;
+#ifdef DEBUG
+					Serial.print("_last_speed  ");
+					Serial.println(_last_speed);
+#endif
+
+				}
+			}
+		}
 
 		break;
 	case DIRECTION_DOWN:
-	 
-		if (Current_pot() < POT_MIN ) {
+
+		if (aCurrent_pot < POT_MIN) {
 			StopMotor();
 			return 0;
 		}
 		else{
 
 			if (_lastdirection != DIRECTION_DOWN){
-  
-			donot_burn_out_hbridge(_PIN_MOTOR_DOWN, DOWN_SPEED);
-                  }
+
+				donot_burn_out_hbridge(_PIN_MOTOR_DOWN, DOWN_SPEED);
+				_last_time = acurrenttime;
+				_lastpot = aCurrent_pot;
+
+			}
+			else{
+				// speed 2
+				if (moved_pot < 0){
+					if ((_last_time - acurrenttime) < timepermove + 500){
+						_last_speed + 5;
+						analogWrite(_PIN_MOTOR, _last_speed);
+
+					}
+					if ((_last_time - acurrenttime) > timepermove + 500){
+						_last_speed - 5;
+						analogWrite(_PIN_MOTOR, _last_speed);
+
+					}
+					_last_time = acurrenttime;
+					_lastpot = aCurrent_pot;
+#ifdef DEBUG
+					Serial.print("_last_speed  ");
+					Serial.println(_last_speed);
+#endif
+
+				}
+			}
 		}
 
 		break;
-//	case DIRECTION_UP_BRAKE:
-//		break;
-//	case DIRECTION_DOWN_BRAKE:
-//		break;
+		//	case DIRECTION_UP_BRAKE:
+		//		break;
+		//	case DIRECTION_DOWN_BRAKE:
+		//		break;
 	default:
 		break;
 	}
 	_lastdirection = _DIRECTION;
 
+
 }
 
- 
+
 
 int MotorServo::Current_pot(){
 
