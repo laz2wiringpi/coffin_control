@@ -1,7 +1,9 @@
-
-#define HAS_IR
-#define HAS_EEPROM
-#define HAS_SoftSer
+ 
+ 
+#include "head_coffin\common_coffin.h"
+ #define HAS_IR
+ #define HAS_EEPROM
+ #define HAS_SoftSer
 #define MEMSHOWHELP
 
 #ifdef HAS_SoftSer
@@ -100,7 +102,7 @@ SoftwareSerial serial_otherboard(rxPin, txPin); // RX, TX
 #endif
 
 ////////// ir global vars 
-#ifdef HAS_IR
+#ifdef HAS_IR 
 
 
 
@@ -110,7 +112,7 @@ SoftwareSerial serial_otherboard(rxPin, txPin); // RX, TX
 int receiver = 11;
 int IRvalue = -1;
 
-IRrecv irrecv(receiver); //create a new instance of receiver
+//IRrecv irrecv(receiver); //create a new instance of receiver
 decode_results results;
 #endif
 
@@ -118,6 +120,7 @@ decode_results results;
 
 int testloop = 1;
 
+/*
 
 enum pr_stats {
 	pr_none,
@@ -127,7 +130,7 @@ enum pr_stats {
 	pr_sitdown,
 
 };
-
+*/
 pr_stats programloopstat = pr_none;
 ////////////////////////////////////////////////////////////////////
 
@@ -277,7 +280,7 @@ void setup()
 
 
 
-#ifdef HAS_IR
+#ifdef HAS_IR3
 	irrecv.enableIRIn(); //start the receiver
 #endif
 	ShowHelp();
@@ -328,7 +331,7 @@ void   programloop(){
 			return;
 		}
 		if (SitMotor_Current_pot >(SitMotor.POT_MAX - 5)) {
-			programloopstat = pr_none;
+			programloopstat = stat_openandsitdone;
 		}
 		else {
 			if ((SitMotor.GetDIRECTION() == DIRECTION_OFF) && (SitMotor_Current_pot < (SitMotor.POT_MAX - -5))) {
@@ -346,7 +349,7 @@ void   programloop(){
 		}
 
 		if (DoorMotor_Current_pot < (DoorMotor.POT_MIN + 5)) {
-			programloopstat = pr_none;
+			programloopstat = stat_closeandsitdone;
 		}
 		else {
 			if ((DoorMotor.GetDIRECTION() == DIRECTION_OFF) && (DoorMotor_Current_pot >(DoorMotor.POT_MIN - 5))) {
@@ -540,7 +543,7 @@ void serialEventotherboard() {
 }
 ////////////////////////////////////////////////////// doIRdata
 void doIRdata() {
-#ifdef HAS_IR
+#ifdef HAS_IR2
 
 
 	if (irrecv.decode(&results)) { //we have received an IR
@@ -1055,6 +1058,13 @@ void docmd(char inChar){
 
 		// off to other board serial1 .. 
 
+	case 'P':
+#ifdef HAS_SoftSer
+		serial_otherboard.print(programloopstat);
+		serial_otherboard.println('p');
+#endif      
+
+		break;
 	default:
 #ifdef HAS_SoftSer
 		//  case 'J':
