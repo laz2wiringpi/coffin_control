@@ -5,7 +5,10 @@
 
 #define HAS_SoftSer
 
-#define HAS_DEBUG1
+//#define HAS_DEBUG1
+
+#define  HAS_MP3_JAW
+
 #define HAS_CMD
 
 #ifdef HAS_SoftSer
@@ -175,37 +178,20 @@ byte do_talk_loop() {
 
 
 
-#ifndef HAS_MUSIC
 
-
-
-		if (!jawopen){
-
-			jawservo.write(jawclosedpos, 30, false); // set the intial position of the servo, as fast as possible, wait until done
-			jawopen = true;
-		}
-		else{
-			jawservo.write(jawopenpos, 30, false); // set the intial position of the servo, as fast as possible, wait until done
-			jawopen = false;
-		}
-
-		if ((start_loop_time + 5000) < millis()){
-			jawservo.write(jawclosedpos, 30, false);
-			loopstatus = LOOP_FINISH;
-		}
-
-
-
-#endif	
 		
 		//valMp3 = analogRead(A3);
-#ifdef HAS_MUSIC
+#ifdef HAS_MP3_JAW
 		valMp3 = analogRead(A3);
 	
 #ifdef HAS_DEBUG1
 		Serial.println(valMp3);
 #endif
 		
+
+
+
+
 		switch (valMp3)
 		{
 		 
@@ -270,7 +256,51 @@ byte do_talk_loop() {
 		*/
 #endif		
 
+#ifndef HAS_MP3_JAW
 
+
+
+		if (!jawopen) {
+
+			jawservo.write(jawclosedpos, 30, false); // set the intial position of the servo, as fast as possible, wait until done
+			jawopen = true;
+		}
+		else {
+			jawservo.write(jawopenpos, 30, false); // set the intial position of the servo, as fast as possible, wait until done
+			jawopen = false;
+		}
+
+		if ((start_loop_time + 5000) < millis()) {
+			jawservo.write(jawclosedpos, 30, false);
+			loopstatus = LOOP_FINISH;
+		}
+
+
+		while (serial_MP3.available()) {
+
+			char inChar = (char)serial_MP3.read();
+			switch (inChar)
+			{
+			case 'X':
+				jawservo.write(jawclosedpos);
+				loopstatus = LOOP_FINISH;
+				break;
+			case 'x':
+				jawservo.write(jawclosedpos);
+				loopstatus = LOOP_FINISH;
+				break;
+			case 'E':
+				jawservo.write(jawclosedpos);
+				loopstatus = LOOP_FINISH;
+				break;
+
+			default:
+				break;
+			}
+
+		}
+
+#endif	
 
 
 
@@ -391,17 +421,10 @@ void   programloop() {
 	case stat_openandsitdone:
  
  
-			programloopstat = pr_open;
+			programloopstat = pr_situp ;
   	
 	     break;
-	case stat_closeandsitdone  :
- 
- 
-			programloopstat = pr_after_close ;
-  
 
-	 
-		break;
 		
 /*
 	case pr_open:
@@ -513,6 +536,15 @@ void   programloop() {
 
 		break;
  
+	case stat_closeandsitdone:
+
+
+		programloopstat = pr_after_close;
+
+
+
+		break;
+
 	case pr_after_close:
 		switch (do_after_close_loop()) {
 
