@@ -78,11 +78,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\LEDFader.h" />
     <ClInclude Include="common_coffin.h">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="Visual Micro\.head_coffin.vsarduino.h" />
     <ClInclude Include="__vm\.head_coffin.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\LEDFader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

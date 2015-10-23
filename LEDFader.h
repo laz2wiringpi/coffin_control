@@ -74,6 +74,8 @@ private:
 
     // Returns how much of the fade is complete in a percentage between 0 - 100
     uint8_t get_progress();
+	bool enabled;
+
 };
 
 #endif /* LEDFader_H_ */

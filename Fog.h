@@ -33,6 +33,8 @@ public:
 	void FogNOW();
 	boolean  isfogstatuson();
 	void  setfogstatuson();
+ 
+
 private:
 
 	byte _PIN;

@@ -1,6 +1,7 @@
 #include <VarSpeedServo.h> 
 //////////////////////////////////////////////////////////
 #include "common_coffin.h" 
+#include "..\LEDFader.h" 
 
 
 #define HAS_SoftSer
@@ -16,16 +17,29 @@
 #define  HAS_MUSIC
 #include <SoftwareSerial.h>
 
-#define rxPin 2
-#define txPin 3
+
 
 #endif
+///////// PINS 
+#define  neckservoH_pin 9
+#define rxPin 2
+#define txPin 3
+#define jawservo_pin 10
+
+#define  EYE_R_LED_PIN 3
+#define  EYE_L_LED_PIN 4
+
+///////////////////////////
+#define FADE_TIME 2000
 
 #define LOOK_MID   90 
 #define LOOK_RIGHT_SPEED  30 
 
 //////////////////////////////////// 
 
+#define LED_DIR_UP 1
+#define LED_DIR_DOWN -1
+////
 boolean jawopen = false;
 #define jawclosedpos  30 
 #define jawopenpos   40 
@@ -33,7 +47,10 @@ boolean jawopen = false;
 
 
 /////////////////////////////////////
-
+LEDFader LedEyeR;
+LEDFader LedEyeL;
+int LedEyeRdirection = LED_DIR_UP;
+int LedEyeLdirection = LED_DIR_UP;
 
 pr_stats programloopstat = pr_none;
 
@@ -77,9 +94,15 @@ void setup() {
 
 
 
-	neckservoH.attach(9);  // attaches the servo on pin 9 to the servo object
+	LedEyeL = LEDFader(EYE_L_LED_PIN);
+	LedEyeL.fade(255, FADE_TIME);
+
+	LedEyeR = LEDFader(EYE_R_LED_PIN);
+	LedEyeR.fade(255, FADE_TIME);
+
+	neckservoH.attach(neckservoH_pin);  // attaches the servo on pin 9 to the servo object
 	neckservoH.write(90, 20, true); // set the intial position of the servo, as fast as possible, wait until done
-	jawservo.attach(10);  // attaches the servo on pin 9 to the servo object
+	jawservo.attach(jawservo_pin);  // attaches the servo on pin 9 to the servo object
  
 	jawservo.write(90,20,true); // set the intial position of the servo, as fast as possible, wait until done
 //	jawservo.write(jawopenpos, 5, true); // set the intial position of the servo, as fast as possible, wait until done
@@ -89,6 +112,60 @@ void setup() {
 	delay(5000);
 	start_loop_time = millis();
 }
+
+
+void ledloop() {
+
+	if (LedEyeR.enabled)
+	{
+
+
+		LedEyeR.update();
+
+
+		// LED no longer fading, switch direction
+		if (!LedEyeR.is_fading()) {
+
+			// Fade down
+			if (LedEyeRdirection == LED_DIR_UP) {
+				LedEyeR.fade(0, FADE_TIME);
+				LedEyeRdirection = LED_DIR_DOWN;
+			}
+			// Fade up
+			else {
+				LedEyeR.fade(255, FADE_TIME);
+				LedEyeRdirection = LED_DIR_UP;
+			}
+		}
+	}
+
+
+	if (LedEyeL.enabled)
+	{
+
+
+		LedEyeR.update();
+
+
+		// LED no longer fading, switch direction
+		if (!LedEyeL.is_fading()) {
+
+			// Fade down
+			if (LedEyeLdirection == LED_DIR_UP) {
+				LedEyeL.fade(0, FADE_TIME);
+				LedEyeLdirection = LED_DIR_DOWN;
+			}
+			// Fade up
+			else {
+				LedEyeL.fade(255, FADE_TIME);
+				LedEyeLdirection = LED_DIR_UP;
+			}
+		}
+	}
+
+
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////// do_before_open_loop
 byte do_before_open_loop() {
@@ -167,7 +244,8 @@ byte do_talk_loop() {
 
 #endif
 
-
+		LedEyeR.enabled = true;
+		LedEyeL.enabled = true;
 
 		loopstatus = LOOP_RUN;
 
@@ -343,7 +421,8 @@ byte do_sleep_loop() {
 	case LOOP_START:
 		// look to the right 
 		neckservoH.write(val, LOOK_RIGHT_SPEED, false);
-
+		LedEyeR.enabled = false;
+		LedEyeL.enabled = false;
 		loopstatus = LOOP_RUN;
 
 		break;
@@ -672,6 +751,7 @@ void loop()
 {
 
 	serialEventfromcmdboard(); //call the function
+	ledloop();
 
 #ifndef HAS_CMD
 	// do a testing loop 

@@ -71,9 +71,14 @@ MotorServo DoorMotor(A1,
 	2,
 	4);
 
-
-Fog FogMachine(20);
+#define rxPin 19
+#define txPin 18
+#define FOG_PIN 20
 #define LED_PIN 13
+
+//////////////////////
+
+Fog FogMachine(FOG_PIN);
 
 #define FADE_TIME 2000
 
@@ -83,8 +88,6 @@ Fog FogMachine(20);
 LEDFader LedMain;
 int LedMaindirection = LED_DIR_UP;
 
-#define rxPin 19
-#define txPin 18
 
 ////////////////////////////////////////////////
 
@@ -133,7 +136,13 @@ pr_stats programloopstat = pr_none;
 
 
 void ledloop() {
+
+	if (LedMain.enabled)
+	{
+
+	
 	LedMain.update();
+	 
 
 	// LED no longer fading, switch direction
 	if (!LedMain.is_fading()) {
@@ -148,6 +157,7 @@ void ledloop() {
 			LedMain.fade(255, FADE_TIME);
 			LedMaindirection = LED_DIR_UP;
 		}
+	}
 	}
 }
 
@@ -291,6 +301,8 @@ void doerror(String serror) {
 
 void   programloop() {
 
+	FogMachine.check();
+	ledloop();
 
 	if (DoorMotor.check() < 0) {
 		doerror(F("DoorMotor FAIL"));
@@ -331,6 +343,9 @@ void   programloop() {
 		}
 		else {
 			if ((DoorMotor.GetDIRECTION() == DIRECTION_OFF) && (DoorMotor_Current_pot < (DoorMotor.POT_MAX - 5))) {
+				FogMachine.FogStart(0, 0);
+				LedMain.enabled = true;
+
 				docmd('o');
 
 			}
@@ -350,6 +365,7 @@ void   programloop() {
 		else {
 			if ((SitMotor.GetDIRECTION() == DIRECTION_OFF) && (SitMotor_Current_pot < (SitMotor.POT_MAX - -5))) {
 				docmd('U');
+			 
 
 			}
 		}
@@ -376,6 +392,8 @@ void   programloop() {
 		}
 		else {
 			if ((DoorMotor.GetDIRECTION() == DIRECTION_OFF) && (DoorMotor_Current_pot >(DoorMotor.POT_MIN - 5))) {
+				FogMachine.Stop() ;
+				LedMain.enabled = false;
 				docmd('c');
 
 			}
