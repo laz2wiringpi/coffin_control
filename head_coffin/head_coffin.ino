@@ -6,6 +6,7 @@
 #define HAS_SoftSer
 
 #define HAS_DEBUG1
+#define HAS_CMD
 
 #ifdef HAS_SoftSer
  
@@ -64,9 +65,7 @@ void setup() {
 #ifdef HAS_CMD
 	Serial.begin(38400);
 #endif
-#ifdef HAS_DEBUG1
-	Serial.begin(38400);
-#endif
+
 	 
 
 #ifdef HAS_MUSIC
@@ -102,41 +101,6 @@ byte do_before_open_loop() {
 
 
 /////////////////////////////////////////////////////////////////////////////////////// do_open_loop
-byte do_open_loop() {
-#ifdef HAS_CMD
-	switch (loopstatus)
-	{
-	case LOOP_START:
-
-		serial_otherboard.println('o');
-
-
-
-		loopstatus = LOOP_RUN;
-
-		break;
-	case LOOP_RUN:
-
-		if (otherbooard_pr_stats == pr_none) {
-			loopstatus = LOOP_FINISH;
-		}
-		else {
-			serial_otherboard.println('p');
-		}
-
-		break;
-	case LOOP_FINISH:
-		break;
-
-	}
-
-	return 	loopstatus;
-#endif   
-#ifndef HAS_CMD
-	return 	LOOP_FINISH;
-#endif   
-
-}
 /////////////////////////////////////////////////////////////////////////////////////// do_wakeup_loop
 byte do_wakeup_loop() {
 
@@ -324,7 +288,10 @@ byte do_talk_loop() {
 /////////////////////////////////////////////////////////////////////////////////////// do_sitdown_loop
 byte do_sitdown_loop() {
 
-
+#ifdef HAS_CMD
+ 	Serial.print(pr_close);
+	Serial.println('p');
+#endif
 
 	return 	LOOP_FINISH;
 
@@ -374,45 +341,7 @@ byte do_sleep_loop() {
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////// do_close_loop
-byte do_close_loop() {
-#ifdef HAS_CMD
-	switch (loopstatus)
-	{
-	case LOOP_START:
-
-		serial_otherboard.println('c');
-
-
-
-		loopstatus = LOOP_RUN;
-
-		break;
-	case LOOP_RUN:
-
-		if (otherbooard_pr_stats == pr_none ) {
-			loopstatus = LOOP_FINISH;
-
-		}
-		else {
-			serial_otherboard.println('p');
-		}
-
-		break;
-	case LOOP_FINISH:
-		break;
-
-	}
-
-	return 	loopstatus;
-#endif   
-#ifndef HAS_CMD
-
-	return 	LOOP_FINISH;
-#endif   
-
-}
-
+ 
 /////////////////////////////////////////////////////////////////////////////////////// do_after_close_loop
 byte do_after_close_loop() {
 
@@ -436,10 +365,7 @@ void   programloop() {
 
 	switch (programloopstat)
 	{
-	case pr_none:
-		start_loop_time = millis();
-
-		break;
+ 
 
 	case pr_before_open_loop:
 		switch (do_before_open_loop()) {
@@ -452,11 +378,32 @@ void   programloop() {
 		case LOOP_FINISH:
 			loopstatus = LOOP_START;
 			start_loop_time = millis();
+#ifdef HAS_CMD
+			programloopstat = pr_none;
+#else
 			programloopstat = pr_open;
+#endif
+
 			return;
 
 		}
 
+	case stat_openandsitdone:
+ 
+ 
+			programloopstat = pr_open;
+  	
+	     break;
+	case stat_closeandsitdone  :
+ 
+ 
+			programloopstat = pr_after_close ;
+  
+
+	 
+		break;
+		
+/*
 	case pr_open:
 		switch (do_open_loop()) {
 
@@ -474,7 +421,7 @@ void   programloop() {
 
 
 		break;
-
+*/
 	case pr_situp:
 		switch (do_situp_loop()) {
 
@@ -520,7 +467,12 @@ void   programloop() {
 		case  LOOP_FINISH:
 			loopstatus = LOOP_START;
 			start_loop_time = millis();
+		 
+ 
 			programloopstat = pr_sitdown;
+ 
+ 
+
 			return;
 
 		}
@@ -531,7 +483,7 @@ void   programloop() {
 		switch (do_sitdown_loop()) {
 
 		case LOOP_START:
-			break;
+ 			break;
 		case LOOP_RUN:
 			break;
 		case  LOOP_FINISH:
@@ -554,29 +506,13 @@ void   programloop() {
 		case  LOOP_FINISH:
 			loopstatus = LOOP_START;
 			start_loop_time = millis();
-			programloopstat = pr_close;
+			programloopstat = pr_none;
 			return;
 
 		}
 
 		break;
-
-	case pr_close:
-		switch (do_close_loop()) {
-
-		case LOOP_START:
-			break;
-		case LOOP_RUN:
-			break;
-		case LOOP_FINISH:
-			loopstatus = LOOP_START;
-			start_loop_time = millis();
-			programloopstat = pr_after_close;
-			return;
-
-		}
-
-		break;
+ 
 	case pr_after_close:
 		switch (do_after_close_loop()) {
 
@@ -595,18 +531,21 @@ void   programloop() {
 
 		break;
 	default:
+		loopstatus = LOOP_START;
+		start_loop_time = millis();
+		programloopstat = pr_none;
 		break;
 	}
 
 }
 
-void serialEventotherboard() {
+void serialEventfromcmdboard() {
 	// always has last status ...
 #ifdef HAS_CMD
 
+ 
 
-
-	while (serial_otherboard.available()) {
+	while (Serial.available()) {
 
 		// get the new byte:
 		char inChar = (char)Serial.read();
@@ -624,23 +563,57 @@ void serialEventotherboard() {
 			break;
 
 		case'P':
+
+
 			switch (other_inputvalue)
 			{
-			case pr_none :
+			case pr_none:
 				otherbooard_pr_stats = pr_none;
+				break;
+			case pr_before_open_loop:
+				otherbooard_pr_stats = pr_before_open_loop;
+				programloopstat = pr_before_open_loop;
 				break;
 			case pr_open:
 				otherbooard_pr_stats = pr_open;
 				break;
+			case pr_wake_up:
+				otherbooard_pr_stats = pr_wake_up;
+				programloopstat = pr_wake_up;
+				break;
+			case pr_situp:
+				otherbooard_pr_stats = pr_situp;
+				programloopstat = pr_situp;
+				break;
+			case pr_talk:
+				otherbooard_pr_stats = pr_talk;
+				programloopstat = pr_talk;
+				break;
+			case pr_sitdown:
+				otherbooard_pr_stats = pr_sitdown;
+				break;
+			case pr_sleep:
+				otherbooard_pr_stats = pr_sleep;
+ 				programloopstat = pr_sleep;
+				break;
 			case pr_close:
 				otherbooard_pr_stats = pr_close;
 				break;
-
-			case pr_sitdown :
-				otherbooard_pr_stats = pr_sitdown;
+			case pr_after_close:
+				otherbooard_pr_stats = pr_after_close;
+				programloopstat = pr_after_close;
 				break;
-			case pr_situp :
-				otherbooard_pr_stats = pr_situp;
+			case stat_openandsitdone:
+				otherbooard_pr_stats = stat_openandsitdone;
+				programloopstat = stat_openandsitdone;
+				break;
+			case stat_closeandsitdone:
+				otherbooard_pr_stats = stat_closeandsitdone;
+				programloopstat = stat_closeandsitdone;
+
+				break;
+			default:
+				/// unknown 
 				break;
 
 			}
@@ -666,13 +639,13 @@ void serialEventotherboard() {
 void loop()
 {
 
-	serialEventotherboard(); //call the function
+	serialEventfromcmdboard(); //call the function
 
-
+#ifndef HAS_CMD
 	// do a testing loop 
 	if (programloopstat == pr_none)
 		programloopstat = pr_before_open_loop;
-
+#endif
 	programloop();
 
 

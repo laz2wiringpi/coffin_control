@@ -1,9 +1,10 @@
- 
- 
+
+
 #include "head_coffin\common_coffin.h"
- #define HAS_IR
- #define HAS_EEPROM
- #define HAS_SoftSer
+
+#define HAS_IR
+#define HAS_EEPROM
+#define HAS_SoftSer
 #define MEMSHOWHELP
 
 #ifdef HAS_SoftSer
@@ -14,7 +15,7 @@
 
 #ifdef HAS_EEPROM
 
-#include <EEPROM.h>
+#include <EEPROM.h> 
 #endif
 #include "MotorServo.h"
 
@@ -24,11 +25,7 @@
 #ifdef HAS_IR
 #include "IRremote.h"
 #endif
-
-
-#ifdef DEBUG 
-
-#endif
+ 
 
 
 #define     eadd_SitMotor_POT_MIN       1
@@ -55,10 +52,11 @@
 #define NOVALUEINPUT -1
 
 #define C_VERSION "V1.05"
-
-long inputvalue = NOVALUEINPUT;
-
 #define NOVALUEINPUT -1
+long inputvalue = NOVALUEINPUT;
+long other_inputvalue = NOVALUEINPUT;
+pr_stats otherbooard_pr_stats = pr_none;
+
 
 
 
@@ -112,13 +110,12 @@ SoftwareSerial serial_otherboard(rxPin, txPin); // RX, TX
 int receiver = 11;
 int IRvalue = -1;
 
-//IRrecv irrecv(receiver); //create a new instance of receiver
+ IRrecv irrecv(receiver); //create a new instance of receiver
 decode_results results;
 #endif
 
 /////////// program loop vars 
 
-int testloop = 1;
 
 /*
 
@@ -155,7 +152,7 @@ void ledloop() {
 }
 
 ////////////////////////////////////////////////////////////////////
-void write_to_eprom(){
+void write_to_eprom() {
 
 #ifdef HAS_EEPROM
 	byte savedummyvar = 1;
@@ -246,7 +243,7 @@ void setup()
 		DoorMotor.DOWN_SPEED = 55;
 #ifdef HAS_EEPROM
 	}
-	else{
+	else {
 
 		int tmpint = 0;
 		int tmpint2 = 0;
@@ -280,20 +277,20 @@ void setup()
 
 
 
-#ifdef HAS_IR3
+#ifdef HAS_IR
 	irrecv.enableIRIn(); //start the receiver
 #endif
 	ShowHelp();
 }
 
-void doerror(String serror){
+void doerror(String serror) {
 	errordetect = true;
 	errorstring = serror;
 
 }
 
-void   programloop(){
-	
+void   programloop() {
+
 
 	if (DoorMotor.check() < 0) {
 		doerror(F("DoorMotor FAIL"));
@@ -302,15 +299,32 @@ void   programloop(){
 		doerror(F("SitMotor FAIL"));
 	}
 
-    int DoorMotor_Current_pot = DoorMotor.Current_pot();
+	int DoorMotor_Current_pot = DoorMotor.Current_pot();
 	int SitMotor_Current_pot = SitMotor.Current_pot();
+
+/// broken pot ...
+
+	if ((DoorMotor_Current_pot < 2 )||(DoorMotor_Current_pot > 1023))
+		doerror(F("DoorMotor_Current_pot pot FAIL"));
+
+	if ((SitMotor_Current_pot < 2) || (SitMotor_Current_pot > 1023))
+		doerror(F("SitMotor_Current_pot pot FAIL"));
+/////
+
 
 	if (errordetect) return;
 
-	switch (programloopstat){
-	case pr_open:
 
 	 
+	switch (programloopstat) {
+
+	case pr_none:
+		// ADD TIMER AND CHECK FOR FIRE HERE 
+		break;
+
+	case pr_open:
+
+
 
 		if (DoorMotor_Current_pot > (DoorMotor.POT_MAX - 5)) {
 			programloopstat = pr_situp;
@@ -323,14 +337,14 @@ void   programloop(){
 		}
 		break;
 	case pr_situp:
-	 
-	 
+
+
 
 		if (DoorMotor_Current_pot < (DoorMotor.POT_MAX - 5)) {
 			programloopstat = pr_open;
 			return;
 		}
-		if (SitMotor_Current_pot >(SitMotor.POT_MAX - 5)) {
+		if (SitMotor_Current_pot > (SitMotor.POT_MAX - 5)) {
 			programloopstat = stat_openandsitdone;
 		}
 		else {
@@ -341,8 +355,17 @@ void   programloop(){
 		}
 		break;
 
+	case stat_openandsitdone:
+		docmd('P');
+
+	case stat_closeandsitdone:
+		docmd('P');
+	 
+		break;
+
+
 	case pr_close:
-	
+
 		if (SitMotor_Current_pot > (SitMotor.POT_MIN + 30)) {
 			programloopstat = pr_sitdown;
 			return;
@@ -359,7 +382,7 @@ void   programloop(){
 		}
 		break;
 	case pr_sitdown:
-	 
+
 		if (SitMotor_Current_pot < (SitMotor.POT_MIN + 5)) {
 			programloopstat = pr_close;
 		}
@@ -370,6 +393,7 @@ void   programloop(){
 			}
 		}
 		break;
+
 
 
 
@@ -388,42 +412,23 @@ void loop()
 #endif
 
 
-	if (errordetect){
+	if (errordetect) {
 		Serial.print(errorstring);
 		delay(1000);
 	}
-	else{
-
-		if (testloop){
+	else {
 
 
 
-			if (DoorMotor.check() < 0) {
-				doerror(F("DoorMotor FAIL"));
-			}
-
-			if (SitMotor.check() < 0) {
-				doerror(F("SitMotor FAIL"));
-			}
-
-			FogMachine.check();
-
-		}
-		else {
-
-			programloop();
-		}
+		programloop();
 
 
-		//  Serial.print("---- :  "  );
-		// int d = SitMotor.GetDIRECTION();
-		//  Serial.print(d);
 	}
 }
 
 
 ////////////////////////////////////////////////////// ShowHelp
-void 	ShowHelp()  {
+void 	ShowHelp() {
 #ifdef MEMSHOWHELP
 
 
@@ -529,11 +534,79 @@ void serialEventotherboard() {
 		// get the new byte:
 		char inChar = (char)Serial.read();
 
+		switch (inChar) {
+		case 48 ... 57:
 
-#ifdef DEBUG
-		Serial.print("NEW otherboard :  ");
-		Serial.println(inChar);
-#endif
+			if (other_inputvalue == NOVALUEINPUT) {
+				other_inputvalue = 0;
+			}
+			other_inputvalue = 10 * other_inputvalue + inChar - '0';
+
+
+			break;
+
+		case'p':
+
+
+			switch (other_inputvalue)
+			{
+			case pr_none:
+				otherbooard_pr_stats = pr_none;
+				break;
+			case pr_before_open_loop:
+				otherbooard_pr_stats = pr_before_open_loop;
+			 
+				break;
+			case pr_open:
+				otherbooard_pr_stats = pr_open;
+			//	programloopstat = pr_open;
+				break;
+			case pr_wake_up:
+				otherbooard_pr_stats = pr_wake_up;
+		 
+				break;
+			case pr_situp:
+				otherbooard_pr_stats = pr_situp;
+			//	programloopstat = pr_situp;
+				break;
+			case pr_talk:
+				otherbooard_pr_stats = pr_talk;
+			//	programloopstat = pr_talk;
+				break;
+			case pr_sitdown:
+				otherbooard_pr_stats = pr_sitdown;
+				break;
+			case pr_sleep:
+				otherbooard_pr_stats = pr_sleep;
+			//	programloopstat = pr_sleep;
+				break;
+			case pr_close:
+				otherbooard_pr_stats = pr_close;
+				break;
+			case pr_after_close:
+				otherbooard_pr_stats = pr_after_close;
+			//	programloopstat = pr_after_close;
+				break;
+			case stat_openandsitdone:
+				otherbooard_pr_stats = stat_openandsitdone;
+			//	programloopstat = stat_openandsitdone;
+				break;
+			case stat_closeandsitdone:
+				otherbooard_pr_stats = stat_closeandsitdone;
+			//	programloopstat = stat_closeandsitdone;
+
+				break;
+			default:
+				/// unknown 
+				break;
+
+			}
+
+
+			other_inputvalue = NOVALUEINPUT;
+			break;
+		}
+	
 
 		// if the incoming character is a newline, set a flag
 		// so the main loop can do something about it:
@@ -543,7 +616,7 @@ void serialEventotherboard() {
 }
 ////////////////////////////////////////////////////// doIRdata
 void doIRdata() {
-#ifdef HAS_IR2
+#ifdef HAS_IR
 
 
 	if (irrecv.decode(&results)) { //we have received an IR
@@ -596,7 +669,7 @@ void doIRdata() {
 			break;
 
 		case 0X32C6FDF7: //////////////////////////////////////////////////////// *
-			testloop = false;
+	 
 			programloopstat = pr_situp;
 #ifdef DEBUG
 			Serial.println("*");
@@ -607,7 +680,7 @@ void doIRdata() {
 			break;
 
 		case 0X3EC3FC1B: //////////////////////////////////////////////////////// #
-			testloop = false;
+	 
 			programloopstat = pr_sitdown;
 #ifdef DEBUG
 			Serial.println("#");
@@ -618,7 +691,7 @@ void doIRdata() {
 			break;
 
 		case 0X511DBB:  ////////////////////////////////////////////////////////UP
-			testloop = true;
+	 
 			docmd('U');
 #ifdef DEBUG
 			Serial.println("UP");
@@ -628,17 +701,19 @@ void doIRdata() {
 			break;
 
 		case 0XA3C8EDDB: ////////////////////////////////////////////////////////DOWN
-			testloop = true;
+		 
 			docmd('D');
 #ifdef DEBUG 
 			Serial.println("DOWN");
 			Serial.println(IRvalue);
 #endif
+		 
+
 			IRvalue = NOVALUEINPUT;
 			break;
 
 		case 0X52A3D41F: ////////////////////////////////////////////////////////LEFT
-			testloop = true;
+	 
 			docmd('c');
 #ifdef DEBUG
 			Serial.println("LEFT");
@@ -648,7 +723,7 @@ void doIRdata() {
 			break;
 
 		case 0X20FE4DBB: ////////////////////////////////////////////////////////RIGHT
-			testloop = true;
+	 
 			docmd('o');
 #ifdef DEBUG
 			Serial.println("RIGHT");
@@ -662,33 +737,33 @@ void doIRdata() {
 
 			switch (IRvalue) {
 			case NOVALUEINPUT:
-				testloop = true;
+			 
 				docmd('E');
 				break;
 
 			case 1:
-				testloop = true;
+				 
 				docmd('n');
 				break;
 
 			case 2:
-				testloop = true;
+			 
 				docmd('m');
 				break;
 
 			case 3:
-				testloop = true;
+			 
 				docmd('b');
 				break;
 
 
 			case 4:
-				testloop = true;
+			 
 				docmd('f');
 				break;
 
 			case 5:
-				testloop = true;
+			 
 				docmd('g');
 				break;
 			}
@@ -721,7 +796,7 @@ void doIRdata() {
 			Serial.println(IRvalue);
 #endif
 		}
-		irrecv.resume(); //next value
+		irrecv.resume(); //next valuea
 	}
 #endif
 }
@@ -744,12 +819,12 @@ void serialEvent() {
 		// so the main loop can do something about it:
 	}
 }
-void docmd(char inChar){
+void docmd(char inChar) {
 
-	switch (inChar){
+	switch (inChar) {
 
 	case 48 ... 57:
-		if (inputvalue == NOVALUEINPUT){
+		if (inputvalue == NOVALUEINPUT) {
 			inputvalue = 0;
 		}
 		inputvalue = 10 * inputvalue + inChar - '0';
@@ -758,10 +833,7 @@ void docmd(char inChar){
 		break;
 	case 'H':
 		ShowHelp();
-#ifdef HAS_SoftSer
-		serial_otherboard.println('H');
-#endif      
-
+ 
 
 		inputvalue = NOVALUEINPUT;
 		break;
@@ -806,7 +878,7 @@ void docmd(char inChar){
 
 			SitMotor.Goto(inputvalue);
 		}
-		else{
+		else {
 			// will bag head 
 #ifdef DEBUG
 			Serial.print(F("sit will bang head"));
@@ -869,7 +941,7 @@ void docmd(char inChar){
 			Serial.print(F("sit will bang head"));
 #endif
 		}
-		else{
+		else {
 
 			DoorMotor.Goto(inputvalue);
 		}
@@ -1061,11 +1133,16 @@ void docmd(char inChar){
 	case 'P':
 #ifdef HAS_SoftSer
 		serial_otherboard.print(programloopstat);
-		serial_otherboard.println('p');
+		serial_otherboard.println('P');
 #endif      
 
 		break;
+
+ 
+
 	default:
+/*
+
 #ifdef HAS_SoftSer
 		//  case 'J':
 		if (inputvalue != NOVALUEINPUT) {
@@ -1074,7 +1151,7 @@ void docmd(char inChar){
 
 		serial_otherboard.println(inChar);
 #endif   
-
+*/
 		inputvalue = NOVALUEINPUT;
 
 
