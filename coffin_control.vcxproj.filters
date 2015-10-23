@@ -56,13 +56,13 @@
     <ClInclude Include="MotorServo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="__vm\.coffin_control.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="IRremoteInt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="head_coffin\common_coffin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Visual Micro\.coffin_control.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

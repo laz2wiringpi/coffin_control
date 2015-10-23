@@ -60,7 +60,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>c:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;c:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\standard;C:\Users\Allen\Documents\Arduino\coffin_control\head_coffin;c:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SoftwareSerial;c:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SoftwareSerial\utility;c:\Program Files (x86)\Arduino\libraries\VarSpeedServo;c:\Program Files (x86)\Arduino\libraries\VarSpeedServo\utility;c:\Program Files (x86)\Arduino\libraries;c:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\tthcpdvn.0eq\Micro Platforms\default\debuggers;C:\Users\Allen\Documents\Arduino\libraries;c:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;c:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\standard;c:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SoftwareSerial;c:\Program Files (x86)\Arduino\libraries\VarSpeedServo;c:\Program Files (x86)\Arduino\libraries;c:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\tthcpdvn.0eq\Micro Platforms\default\debuggers;C:\Users\Allen\Documents\Arduino\libraries;c:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;c:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;c:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;c:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\standard;C:\Users\Allen\Documents\Arduino\coffin_control\head_coffin;c:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SoftwareSerial;c:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SoftwareSerial\utility;c:\Program Files (x86)\Arduino\libraries\VarSpeedServo;c:\Program Files (x86)\Arduino\libraries\VarSpeedServo\utility;c:\Program Files (x86)\Arduino\libraries;c:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\tthcpdvn.0eq\Micro Platforms\default\debuggers;C:\Users\Allen\Documents\Arduino\libraries;c:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;c:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;c:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>C:\Users\Allen\Documents\Arduino\coffin_control\head_coffin\Visual Micro\.head_coffin.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -81,11 +81,7 @@
     <ClInclude Include="common_coffin.h">
       <FileType>CppCode</FileType>
     </ClInclude>
-    <ClInclude Include="MP3Trigger.h" />
     <ClInclude Include="Visual Micro\.head_coffin.vsarduino.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="MP3Trigger.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
