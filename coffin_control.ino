@@ -1,6 +1,6 @@
 
 
-#include "head_coffin\common_coffin.h"
+#include "common_coffin.h"
 
 #define HAS_IR
 #define HAS_EEPROM
@@ -361,6 +361,8 @@ void   programloop() {
 		}
 		if (SitMotor_Current_pot > (SitMotor.POT_MAX - 5)) {
 			programloopstat = stat_openandsitdone;
+        docmd('P');
+
 		}
 		else {
 			if ((SitMotor.GetDIRECTION() == DIRECTION_OFF) && (SitMotor_Current_pot < (SitMotor.POT_MAX - -5))) {
@@ -371,13 +373,7 @@ void   programloop() {
 		}
 		break;
 
-	case stat_openandsitdone:
-		docmd('P');
 
-	case stat_closeandsitdone:
-		docmd('P');
-	 
-		break;
 
 
 	case pr_close:
@@ -389,6 +385,7 @@ void   programloop() {
 
 		if (DoorMotor_Current_pot < (DoorMotor.POT_MIN + 5)) {
 			programloopstat = stat_closeandsitdone;
+        docmd('P');
 		}
 		else {
 			if ((DoorMotor.GetDIRECTION() == DIRECTION_OFF) && (DoorMotor_Current_pot >(DoorMotor.POT_MIN - 5))) {
@@ -547,12 +544,14 @@ void 	ShowHelp() {
 ////////////////////////////////////////////////////// serialEventotherboard
 void serialEventotherboard() {
 
-	while (Serial.available()) {
+	while (serial_otherboard.available()) {
 
 		// get the new byte:
-		char inChar = (char)Serial.read();
+		char inChar = (char)serial_otherboard.read();
+
 
 		switch (inChar) {
+    
 		case 48 ... 57:
 
 			if (other_inputvalue == NOVALUEINPUT) {
@@ -600,6 +599,7 @@ void serialEventotherboard() {
 				break;
 			case pr_close:
 				otherbooard_pr_stats = pr_close;
+            programloopstat = pr_sitdown;
 				break;
 			case pr_after_close:
 				otherbooard_pr_stats = pr_after_close;
@@ -617,6 +617,9 @@ void serialEventotherboard() {
 			default:
 				/// unknown 
 				break;
+        Serial.print('other board p');
+Serial.println(other_inputvalue);
+
 
 			}
 
