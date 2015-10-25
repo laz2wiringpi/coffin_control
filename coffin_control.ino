@@ -73,8 +73,8 @@ MotorServo DoorMotor(A1,
 
 #define rxPin 19
 #define txPin 18
-#define FOG_PIN 20
-#define LED_PIN 13
+#define FOG_PIN 10
+#define LED_PIN 3
 
 //////////////////////
 
