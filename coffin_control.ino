@@ -80,7 +80,7 @@ MotorServo DoorMotor(A1,
 
 Fog FogMachine(FOG_PIN);
 
-#define FADE_TIME 2000
+#define FADE_TIME 100
 
 #define LED_DIR_UP 1
 #define LED_DIR_DOWN -1
@@ -88,7 +88,7 @@ Fog FogMachine(FOG_PIN);
 LEDFader LedMain;
 int LedMaindirection = LED_DIR_UP;
 
-
+unsigned long start_loop_time = 0;
 ////////////////////////////////////////////////
 
 
@@ -291,6 +291,7 @@ void setup()
 	irrecv.enableIRIn(); //start the receiver
 #endif
 	ShowHelp();
+    start_loop_time = (millis() - 5000);
 }
 
 void doerror(String serror) {
@@ -343,7 +344,7 @@ void   programloop() {
 		}
 		else {
 			if ((DoorMotor.GetDIRECTION() == DIRECTION_OFF) && (DoorMotor_Current_pot < (DoorMotor.POT_MAX - 5))) {
-				FogMachine.FogStart(0, 0);
+				FogMachine.FogNOW();
 				LedMain.enabled = true;
 
 				docmd('o');
@@ -389,9 +390,10 @@ void   programloop() {
 		}
 		else {
 			if ((DoorMotor.GetDIRECTION() == DIRECTION_OFF) && (DoorMotor_Current_pot >(DoorMotor.POT_MIN - 5))) {
-				FogMachine.Stop() ;
-				LedMain.enabled = false;
+			//	FogMachine.Stop() ;
+			//	LedMain.enabled = false;
 				docmd('c');
+          start_loop_time = millis();
 
 			}
 		}
@@ -433,8 +435,12 @@ void loop()
 	}
 	else {
 
-
-
+ if ((start_loop_time + 40000)  < millis() ){
+   programloopstat = pr_situp;
+   start_loop_time = millis();
+ }
+       
+        
 		programloop();
 
 
@@ -603,7 +609,7 @@ void serialEventotherboard() {
 				break;
 			case pr_after_close:
 				otherbooard_pr_stats = pr_after_close;
-			//	programloopstat = pr_after_close;
+		  
 				break;
 			case stat_openandsitdone:
 				otherbooard_pr_stats = stat_openandsitdone;
@@ -611,6 +617,7 @@ void serialEventotherboard() {
 				break;
 			case stat_closeandsitdone:
 				otherbooard_pr_stats = stat_closeandsitdone;
+        LedMain.enabled = false;
 			//	programloopstat = stat_closeandsitdone;
 
 				break;
